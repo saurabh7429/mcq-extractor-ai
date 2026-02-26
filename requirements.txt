@@ -1,0 +1,29 @@
+# Flask and extensions
+Flask>=3.1.0
+Flask-CORS>=5.0.0
+Werkzeug>=3.1.0
+python-dotenv>=1.0.1
+
+# Database
+SQLAlchemy>=2.0.36
+
+# PDF processing
+pypdf>=5.1.0
+pdfplumber>=0.11.0
+
+# AI/ML
+google-generativeai>=0.8.0
+
+# Other utilities
+python-json-logger>=2.0.7
+gunicorn>=23.0.0
+
+# Image processing
+Pillow>=11.0.0
+
+# HTTP requests
+requests>=2.32.0
+
+# OCR Support (for scanned PDFs)
+pytesseract>=0.3.10
+pdf2image>=1.17.0
