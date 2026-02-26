@@ -19,6 +19,73 @@ logger = logging.getLogger(__name__)
 bp = Blueprint('extract', __name__)
 
 
+@bp.route('/process', methods=['POST'])
+def process_file():
+    """
+    Process an uploaded PDF file and extract MCQs.
+    
+    Request body:
+        file_id: UUID of the uploaded file
+    
+    Returns:
+        JSON response with extracted MCQs
+    """
+    logger.info("Processing file for MCQ extraction")
+    
+    # Get file_id from request
+    data = request.get_json()
+    if not data or 'file_id' not in data:
+        logger.warning("No file_id provided in request")
+        raise ValidationError("File ID is required.")
+    
+    file_id = data.get('file_id')
+    
+    # Call the actual extraction function
+    return _extract_and_process(file_id)
+
+
+@bp.route('/preview', methods=['POST'])
+def preview_mcqs():
+    """
+    Preview extracted MCQs for a file.
+    
+    Request body:
+        file_id: UUID of the uploaded file
+    
+    Returns:
+        JSON response with extracted MCQs
+    """
+    logger.info("Preview MCQs for file")
+    
+    # Get file_id from request
+    data = request.get_json()
+    if not data or 'file_id' not in data:
+        logger.warning("No file_id provided in request")
+        raise ValidationError("File ID is required.")
+    
+    file_id = data.get('file_id')
+    
+    # Try to get from storage first
+    try:
+        storage = StorageService()
+        json_path = storage.get_json_by_uuid(file_id)
+        
+        if json_path and json_path.exists():
+            with open(json_path, 'r', encoding='utf-8') as f:
+                mcqs = json.load(f)
+            
+            return jsonify({
+                'status': 'success',
+                'mcqs': mcqs,
+                'count': len(mcqs)
+            }), 200
+    except Exception as e:
+        logger.warning(f"Failed to load JSON from storage: {e}")
+    
+    # If not in storage, extract again
+    return _extract_and_process(file_id)
+
+
 @bp.route('/mcq', methods=['POST'])
 def extract_mcq():
     """
@@ -105,10 +172,10 @@ def get_extraction_status(task_id: str):
     }), 200
 
 
-@bp.route('/<file_id>', methods=['GET', 'POST'])
-def extract_text_from_file(file_id: str):
+# Internal function for extraction - must be defined BEFORE the dynamic route
+def _extract_and_process(file_id: str):
     """
-    Extract text and MCQs from an uploaded PDF file by file_id.
+    Internal function to extract and process MCQs from a file.
     
     Args:
         file_id: Unique identifier of the uploaded file
@@ -175,3 +242,17 @@ def extract_text_from_file(file_id: str):
     except Exception as e:
         logger.exception(f"Error during MCQ extraction: {str(e)}")
         raise ValidationError(f"Failed to extract MCQs: {str(e)}")
+
+
+@bp.route('/<file_id>', methods=['GET', 'POST'])
+def extract_text_from_file(file_id: str):
+    """
+    Extract text and MCQs from an uploaded PDF file by file_id.
+    
+    Args:
+        file_id: Unique identifier of the uploaded file
+    
+    Returns:
+        JSON response with extracted MCQs
+    """
+    return _extract_and_process(file_id)

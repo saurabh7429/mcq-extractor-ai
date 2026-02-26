@@ -14,8 +14,8 @@ logger = logging.getLogger(__name__)
 bp = Blueprint('download', __name__)
 
 
-@bp.route('/<file_id>', methods=['GET'])
-def download_json_by_id(file_id: str):
+@bp.route('/json/<file_id>', methods=['GET'])
+def download_json(file_id: str):
     """
     Download a generated JSON file by file_id (UUID).
     
@@ -25,65 +25,37 @@ def download_json_by_id(file_id: str):
     Returns:
         JSON file as attachment
     """
-    logger.info(f"Download request for file_id: {file_id}")
+    logger.info(f"Download request for JSON: {file_id}")
     
     try:
         storage = StorageService()
-        file_path = storage.get_json_by_uuid(file_id)
         
-        if not file_path:
-            logger.warning(f"File not found for file_id: {file_id}")
-            return jsonify({
-                'success': False,
-                'message': 'File not found',
-                'file_id': file_id
-            }), 404
+        # Check if it's a UUID (no .json extension)
+        if '.' not in file_id:
+            # Try as UUID first
+            file_path = storage.get_json_by_uuid(file_id)
+            if file_path and file_path.exists():
+                return send_file(
+                    file_path,
+                    mimetype='application/json',
+                    as_attachment=True,
+                    download_name=f"{file_id}.json"
+                )
+            # If not found as UUID, try with .json extension
+            file_id = f"{file_id}.json"
         
-        # Use original filename for download
-        filename = file_path.name
-        
-        return send_file(
-            file_path,
-            mimetype='application/json',
-            as_attachment=True,
-            download_name=filename
-        )
-        
-    except Exception as e:
-        logger.exception(f"Error during download: {str(e)}")
-        return jsonify({
-            'success': False,
-            'message': f'Failed to download file: {str(e)}',
-            'file_id': file_id
-        }), 500
-
-
-@bp.route('/json/<filename>', methods=['GET'])
-def download_json(filename: str):
-    """
-    Download a generated JSON file.
-    
-    Args:
-        filename: Name of the JSON file to download
-    
-    Returns:
-        JSON file as attachment
-    """
-    logger.info(f"Download request for JSON: {filename}")
-    
-    try:
-        storage = StorageService()
-        file_path = storage.get_json_path(filename)
+        # Look for file by name
+        file_path = storage.get_json_path(file_id)
         
         if not file_path.exists():
-            logger.warning(f"File not found: {filename}")
-            raise NotFoundError(f"File not found: {filename}")
+            logger.warning(f"File not found: {file_id}")
+            raise NotFoundError(f"File not found: {file_id}")
         
         return send_file(
             file_path,
             mimetype='application/json',
             as_attachment=True,
-            download_name=filename
+            download_name=file_id
         )
         
     except NotFoundError:
