@@ -129,31 +129,56 @@ function createMcqCard(mcq, number) {
     card.className = 'mcq-card';
     
     // Get options as array
-    const options = Array.isArray(mcq.options) ? mcq.options : 
-                   (typeof mcq.options === 'string' ? JSON.parse(mcq.options) : []);
+    let options = [];
+    try {
+        options = Array.isArray(mcq.options) ? mcq.options : 
+                  (typeof mcq.options === 'string' ? JSON.parse(mcq.options) : []);
+    } catch (e) {
+        console.error('Error parsing options:', e);
+        options = [];
+    }
     
-    // Determine correct answer
-    const correctAnswer = mcq.answer || '';
-    const correctIndex = options.findIndex(opt => 
-        opt.toLowerCase() === correctAnswer.toLowerCase()
+    // Determine correct answer - handle multiple formats
+    let correctAnswer = mcq.answer || mcq.correct_answer || mcq.correctAnswer || '';
+    const optionLetters = ['A', 'B', 'C', 'D'];
+    
+    // Clean the correct answer for comparison
+    const cleanCorrectAnswer = correctAnswer.trim().toLowerCase();
+    
+    // Find correct index - check if answer is a letter (A,B,C,D) or actual text
+    let correctIndex = -1;
+    
+    // First try: Check if answer matches an option letter
+    const letterIndex = optionLetters.findIndex(letter => 
+        letter.toLowerCase() === cleanCorrectAnswer
     );
     
-    // Create options HTML
-    const optionLetters = ['A', 'B', 'C', 'D'];
+    if (letterIndex !== -1 && letterIndex < options.length) {
+        // Answer is a letter like "A", "B", "C", "D"
+        correctIndex = letterIndex;
+    } else {
+        // Answer is the actual option text - find matching option
+        correctIndex = options.findIndex(opt => {
+            if (!opt) return false;
+            return opt.toString().trim().toLowerCase() === cleanCorrectAnswer;
+        });
+    }
+    
+    // Create options HTML with correct answer highlighted in green
     const optionsHtml = options.map((option, idx) => {
-        const isCorrect = idx === correctIndex || 
-                         option.toLowerCase() === correctAnswer.toLowerCase();
+        const isCorrect = idx === correctIndex;
         return `
             <div class="mcq-option ${isCorrect ? 'correct' : ''}">
-                <span class="mcq-option-letter">${optionLetters[idx]}</span>
-                <span class="mcq-option-text">${escapeHtml(option)}</span>
+                <span class="mcq-option-letter ${isCorrect ? 'correct-letter' : ''}">${optionLetters[idx] || idx + 1}</span>
+                <span class="mcq-option-text">${escapeHtml(option || '')}</span>
+                ${isCorrect ? '<span class="correct-badge">✓ Correct</span>' : ''}
             </div>
         `;
     }).join('');
     
     card.innerHTML = `
         <div class="mcq-number">${number}</div>
-        <div class="mcq-question">${escapeHtml(mcq.question || '')}</div>
+        <div class="mcq-question">${escapeHtml(mcq.question || mcq.q || '')}</div>
         <div class="mcq-options">
             ${optionsHtml}
         </div>

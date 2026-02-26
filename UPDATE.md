@@ -4,6 +4,54 @@
 
 ---
 
+### Update 003 - 2025-02-25
+**Type**: Major UI Update (Major Update: 1.x.x → 2.0.0)
+
+#### New Features:
+1. **Logo Addition**
+   - Added site logo (logo.png) to header on both index.html and preview.html
+   - Logo displays with hover animation effect
+
+2. **Enhanced Drag & Drop Area**
+   - Made drop zone bigger and more prominent for PC users
+   - Added enhanced mobile-optimized drop zone design
+   - Better visual feedback during drag-over with smooth animations
+   - Larger touch targets for mobile devices
+
+3. **Improved UI & Animations**
+   - Added sophisticated entrance animations with staggered delays
+   - Improved color scheme with professional gradients
+   - Added smooth hover effects with transitions throughout
+   - Added floating background particles effect
+   - Added shimmer effect on progress bar
+   - Enhanced card hover effects with colored top border
+
+4. **Preview Page - Correct Answer Highlighting**
+   - Modified preview.js to properly identify correct answers
+   - Correct answer now highlighted with green color styling
+   - Added "✓ Correct" badge next to correct answer
+   - Green pulsing animation for correct answer highlight
+   - Better answer detection (supports both letter A/B/C/D and full text)
+
+5. **Mobile Optimization**
+   - Better responsive design with larger touch targets
+   - Touch-friendly interactions
+   - Stable, professional mobile UI
+   - Optimized spacing and sizing for all screen sizes
+
+#### Files Modified:
+| File | Change Type | Description |
+|------|-------------|-------------|
+| `frontend/index.html` | Modified | Added logo container and header |
+| `frontend/preview.html` | Modified | Added logo container to header |
+| `frontend/css/styles.css` | Modified | Complete UI overhaul with animations, mobile styles |
+| `frontend/js/preview.js` | Modified | Improved correct answer detection and highlighting |
+| `UPDATE.md` | Modified | Added version 2.0.0 changelog |
+
+#### Version: 1.x.x → 2.0.0 (Major Update)
+
+---
+
 ### Update 002 - 2025-02-25
 **Type**: User Experience Improvement (Minor Update: 1.1.0 → 1.1.1)
 
