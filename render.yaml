@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: mcq-extractor-backend
+    env: python
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn backend.app:app --workers 4 --bind 0.0.0.0:$PORT
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: RENDER
+        value: "1"
+      - key: GEMINI_API_KEY
+        sync: false

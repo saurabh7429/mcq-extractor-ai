@@ -2,7 +2,9 @@
  * upload.js - Handle file upload functionality
  */
 
-const API_BASE_URL = '/api';
+// Get API URL from config - set your backend URL in config.js
+// For production: change API_BASE_URL in config.js to your Render backend URL
+const API_BASE_URL = typeof API !== 'undefined' ? API : '/api';
 
 // DOM Elements
 const dropZone = document.getElementById('dropZone');

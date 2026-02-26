@@ -2,7 +2,8 @@
  * preview.js - Handle MCQ preview functionality
  */
 
-const API_BASE_URL = '/api';
+// Get API URL from config - set your backend URL in config.js
+const API_BASE_URL = typeof API !== 'undefined' ? API : '/api';
 
 // DOM Elements
 const mcqGrid = document.getElementById('mcqGrid');

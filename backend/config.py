@@ -26,14 +26,21 @@ class Config:
     LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
     LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     
-    # File upload settings
+    # File upload settings - use /tmp for production (Render's ephemeral filesystem)
     MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10MB max file size
     ALLOWED_EXTENSIONS = {'pdf'}
-    UPLOAD_FOLDER = BASE_DIR / 'storage' / 'uploaded_pdfs'
-    JSON_OUTPUT_FOLDER = BASE_DIR / 'storage' / 'generated_json'
+    if os.getenv('RENDER'):
+        UPLOAD_FOLDER = Path('/tmp/storage/uploaded_pdfs')
+        JSON_OUTPUT_FOLDER = Path('/tmp/storage/generated_json')
+    else:
+        UPLOAD_FOLDER = BASE_DIR / 'storage' / 'uploaded_pdfs'
+        JSON_OUTPUT_FOLDER = BASE_DIR / 'storage' / 'generated_json'
     
-    # Database settings
-    DATABASE_PATH = BASE_DIR / 'database' / 'mcq.db'
+    # Database settings - use /tmp for production (Render's ephemeral filesystem)
+    if os.getenv('RENDER'):
+        DATABASE_PATH = '/tmp/mcq.db'
+    else:
+        DATABASE_PATH = BASE_DIR / 'database' / 'mcq.db'
     SQLALCHEMY_DATABASE_URI = f'sqlite:///{DATABASE_PATH}'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
