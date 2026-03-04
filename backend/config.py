@@ -45,8 +45,10 @@ class Config:
     if RENDER:
         DATABASE_PATH = '/tmp/mcq.db'
     else:
-        DATABASE_PATH = BASE_DIR / 'database' / 'mcq.db'
-    SQLALCHEMY_DATABASE_URI = f'sqlite:///{DATABASE_PATH}'
+        DATABASE_PATH = str(BASE_DIR / 'database' / 'mcq.db')
+    # Fix for Windows path separators in SQLite URI
+    DB_URI = DATABASE_PATH.replace('\\', '/')
+    SQLALCHEMY_DATABASE_URI = f'sqlite:///{DB_URI}'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 

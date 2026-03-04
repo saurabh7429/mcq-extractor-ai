@@ -36,11 +36,20 @@ def init_db(app=None):
         
         logger.info(f"Initializing database: {db_uri}")
         
-        # Create engine
+        # Ensure database directory exists
+        import os
+        db_path = Config.DATABASE_PATH
+        db_dir = os.path.dirname(db_path)
+        if not os.path.exists(db_dir):
+            os.makedirs(db_dir, exist_ok=True)
+            logger.info(f"Created database directory: {db_dir}")
+        
+        # Create engine with SQLite specific options
         engine = create_engine(
             db_uri,
             echo=Config.FLASK_DEBUG,
-            pool_pre_ping=True
+            pool_pre_ping=True,
+            connect_args={"check_same_thread": False}
         )
         
         # Create session factory

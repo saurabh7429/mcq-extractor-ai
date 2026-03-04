@@ -7,9 +7,9 @@ const Config = {
     // Backend API URL - Update this to your Render backend URL
     // For production: use your Render backend URL
     // For local development: use http://localhost:5000
-    API_BASE_URL: 'https://mcq-extractor-backend.onrender.com',
+    API_BASE_URL: 'http://localhost:5000',
     
-    // API Endpoints
+    // API Endpoints (full paths including /api)
     API_ENDPOINTS: {
         UPLOAD: '/api/upload/file',
         VALIDATE: '/api/upload/validate',

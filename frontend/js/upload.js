@@ -184,7 +184,7 @@ async function uploadFile() {
         formData.append('file', selectedFile);
 
         // Upload file
-        const uploadResponse = await fetch(`${API_BASE_URL}/upload/file`, {
+        const uploadResponse = await fetch(`${API_BASE_URL}/api/upload/file`, {
             method: 'POST',
             body: formData
         });
@@ -217,11 +217,12 @@ async function uploadFile() {
         // Extract MCQs
         showLoading('Extracting MCQs...', 'Using AI to analyze and extract questions');
 
-        const extractResponse = await fetch(`${API_BASE_URL}/extract/${fileId}`, {
+        const extractResponse = await fetch(`${API_BASE_URL}/api/extract/process`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
-            }
+            },
+            body: JSON.stringify({ file_id: fileId })
         });
 
         let extractData = null;

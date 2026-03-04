@@ -74,7 +74,13 @@ async function loadMcqs(fileId) {
         showLoading();
         
         // Fetch MCQs from extract endpoint
-        const response = await fetch(`${API_BASE_URL}/extract/${fileId}`);
+        const response = await fetch(`${API_BASE_URL}/api/extract/preview`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ file_id: fileId })
+        });
         
         if (!response.ok) {
             const errorData = await response.json();
