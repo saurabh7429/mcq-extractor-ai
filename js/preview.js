@@ -44,28 +44,6 @@ function init() {
     backBtn.addEventListener('click', () => {
         window.location.href = 'index.html';
     });
-
-    // search input listener
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.addEventListener('input', () => {
-            const query = searchInput.value.trim().toLowerCase();
-            if (!query) {
-                filteredData = null;
-                displayMCQs(mcqData);
-                updateStats(mcqData.length);
-                return;
-            }
-            const results = mcqData.filter(mcq => {
-                const qtext = mcq.question.toLowerCase();
-                if (qtext.includes(query)) return true;
-                return mcq.options.some(o => o.toLowerCase().includes(query));
-            });
-            filteredData = results;
-            displayMCQs(results);
-            updateStats(results.length);
-        });
-    }
 }
 
 // ==================== Load MCQs ====================

@@ -80,15 +80,26 @@ class AIProcessor:
     
     def _create_extraction_prompt(self, text: str) -> str:
         """Create structured prompt for MCQ extraction."""
-        return f"""Extract all MCQs from the text as JSON array. Requirements:
-- Exactly 4 options per question
-- correct_answer must be index 0-3
-- Output ONLY valid JSON, no other text
+        return f"""You are an expert at extracting multiple choice questions (MCQs) from educational text.
 
-Format:
-[{{"question": "Q?", "options": ["A", "B", "C", "D"], "correct_answer": 0, "explanation": "..."}}]
+TASK: Extract ONLY genuine MCQs that already exist in the text below. DO NOT create new MCQs.
 
-Text: {text}"""
+STRICT RULES:
+1. Only extract MCQs that are PRESENT in the text
+2. Each question must have exactly 4 options (A, B, C, D)
+3. The correct_answer must be the index of the correct option (0-3)
+4. Output ONLY valid JSON array, no other text
+5. If no MCQs exist in the text, return an empty array []
+
+Format (MUST follow exactly):
+[{{"question": "Question text here", "options": ["Option A", "Option B", "Option C", "Option D"], "correct_answer": 0}}]
+
+Note: correct_answer is the INDEX (0=A, 1=B, 2=C, 3=D)
+
+Text to analyze:
+{text}
+
+Now extract MCQs (JSON only):"""
     
     def _parse_response(self, response_text: str) -> List[Dict[str, Any]]:
         """Parse AI response to extract MCQs."""
