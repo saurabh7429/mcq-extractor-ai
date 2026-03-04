@@ -380,6 +380,41 @@ body {
     flex-wrap: wrap;
 }
 
+/* Search/filter bar */
+.preview-search {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.preview-search input {
+    width: 100%;
+    max-width: 400px;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    transition: var(--transition);
+    font-size: 1rem;
+}
+
+.preview-search input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+}
+
+.edit-instructions {
+    text-align: center;
+    color: var(--text-secondary);
+    margin-top: 1rem;
+}
+
+/* editable elements */
+.mcq-question.editing,
+.mcq-option.editing {
+    outline: 2px dashed var(--primary-color);
+    background: #fffceb;
+}
+
 /* ==================== MCQ Grid ==================== */
 .mcq-grid {
     display: grid;

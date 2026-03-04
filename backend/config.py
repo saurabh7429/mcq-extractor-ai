@@ -19,6 +19,9 @@ class Config:
     FLASK_DEBUG = os.getenv('FLASK_DEBUG', '0') == '1'
     SECRET_KEY = os.getenv('SECRET_KEY', os.urandom(24).hex())
     
+    # Check if running on Render
+    RENDER = os.getenv('RENDER', '0') == '1'
+    
     # API Keys
     GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
     
@@ -29,7 +32,9 @@ class Config:
     # File upload settings - use /tmp for production (Render's ephemeral filesystem)
     MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10MB max file size
     ALLOWED_EXTENSIONS = {'pdf'}
-    if os.getenv('RENDER'):
+    
+    # Use /tmp for production (Render's ephemeral filesystem)
+    if RENDER:
         UPLOAD_FOLDER = Path('/tmp/storage/uploaded_pdfs')
         JSON_OUTPUT_FOLDER = Path('/tmp/storage/generated_json')
     else:
@@ -37,7 +42,7 @@ class Config:
         JSON_OUTPUT_FOLDER = BASE_DIR / 'storage' / 'generated_json'
     
     # Database settings - use /tmp for production (Render's ephemeral filesystem)
-    if os.getenv('RENDER'):
+    if RENDER:
         DATABASE_PATH = '/tmp/mcq.db'
     else:
         DATABASE_PATH = BASE_DIR / 'database' / 'mcq.db'

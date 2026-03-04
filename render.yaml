@@ -4,7 +4,7 @@ services:
     env: python
     region: oregon
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn backend.app:app --workers 4 --bind 0.0.0.0:$PORT
+    startCommand: python run.py
     envVars:
       - key: FLASK_ENV
         value: production
@@ -12,3 +12,6 @@ services:
         value: "1"
       - key: GEMINI_API_KEY
         sync: false
+      - key: SECRET_KEY
+        sync: false
+    autoDeploy: true

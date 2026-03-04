@@ -5,6 +5,8 @@
 
 const Config = {
     // Backend API URL - Update this to your Render backend URL
+    // For production: use your Render backend URL
+    // For local development: use http://localhost:5000
     API_BASE_URL: 'https://mcq-extractor-backend.onrender.com',
     
     // API Endpoints
@@ -23,9 +25,12 @@ const Config = {
     }
 };
 
-// Make it globally available
+// Make it globally available for other scripts to use
+// This ensures that upload.js and preview.js can access the API URL
+window.API = Config.API_BASE_URL;
 window.API_BASE_URL = Config.API_BASE_URL;
 window.API_ENDPOINTS = Config.API_ENDPOINTS;
 window.getApiUrl = Config.getUrl.bind(Config);
 
+// Debug log (only in development)
 console.log('API Configuration loaded:', Config.API_BASE_URL);

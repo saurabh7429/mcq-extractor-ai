@@ -24,6 +24,9 @@ Pillow>=11.0.0
 # HTTP requests
 requests>=2.32.0
 
-# OCR Support (for scanned PDFs)
-pytesseract>=0.3.10
-pdf2image>=1.17.0
+# OCR Support (OPTIONAL - for scanned PDFs)
+# These require system-level Tesseract OCR installation
+# Install only if you need OCR support:
+# pip install pytesseract pdf2image
+# pytesseract>=0.3.10
+# pdf2image>=1.17.0

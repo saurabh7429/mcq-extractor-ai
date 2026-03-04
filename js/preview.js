@@ -22,6 +22,10 @@ let mcqData = null;
 // ==================== Event Listeners ====================
 document.addEventListener('DOMContentLoaded', init);
 
+// local filtered state so search doesn't mutate original
+let filteredData = null;
+let interactionInitialized = false;
+
 function init() {
     // Get file_id from sessionStorage
     currentFileId = sessionStorage.getItem('currentFileId');
@@ -40,6 +44,28 @@ function init() {
     backBtn.addEventListener('click', () => {
         window.location.href = 'index.html';
     });
+
+    // search input listener
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.trim().toLowerCase();
+            if (!query) {
+                filteredData = null;
+                displayMCQs(mcqData);
+                updateStats(mcqData.length);
+                return;
+            }
+            const results = mcqData.filter(mcq => {
+                const qtext = mcq.question.toLowerCase();
+                if (qtext.includes(query)) return true;
+                return mcq.options.some(o => o.toLowerCase().includes(query));
+            });
+            filteredData = results;
+            displayMCQs(results);
+            updateStats(results.length);
+        });
+    }
 }
 
 // ==================== Load MCQs ====================
@@ -68,7 +94,6 @@ async function loadMCQs() {
         // Display MCQs
         displayMCQs(mcqData);
         updateStats(mcqData.length);
-        
     } catch (error) {
         console.error('Error loading MCQs:', error);
         showError(error.message || 'Failed to load MCQs. Please try again.');
@@ -102,32 +127,43 @@ function displayMCQs(mcqs) {
     mcqs.forEach((mcq, index) => {
         const card = document.createElement('div');
         card.className = 'mcq-card';
+        card.dataset.index = index;
         
+        const qLabel = `${index + 1}. `;
         const optionsHtml = mcq.options.map((option, optIndex) => {
             const isCorrect = optIndex === mcq.correct_answer;
-            return `<div class="mcq-option ${isCorrect ? 'correct' : ''}">${option}</div>`;
+            return `<div class="mcq-option ${isCorrect ? 'correct' : ''}" data-qindex="${index}" data-optindex="${optIndex}">${option}</div>`;
         }).join('');
         
         card.innerHTML = `
-            <div class="mcq-question">${index + 1}. ${mcq.question}</div>
+            <div class="mcq-question" data-qindex="${index}">${qLabel}${mcq.question}</div>
             <div class="mcq-options">${optionsHtml}</div>
         `;
         
         mcqGrid.appendChild(card);
     });
+
+    // attach listeners after rendering
+    attachInteractionHandlers();
 }
 
 function updateStats(count) {
+    let total = mcqData ? mcqData.length : 0;
+    let subtitle = 'Review and download your extracted multiple choice questions';
+    if (filteredData && filteredData.length !== total) {
+        subtitle = `Showing ${count} of ${total} questions`; 
+    }
     previewStats.innerHTML = `
         <h2>${count} MCQs Extracted</h2>
-        <p>Review and download your extracted multiple choice questions</p>
+        <p>${subtitle}</p>
     `;
 }
 
 // ==================== Copy JSON ====================
 async function copyJson() {
     try {
-        const jsonString = JSON.stringify(mcqData, null, 2);
+        const target = filteredData || mcqData;
+        const jsonString = JSON.stringify(target, null, 2);
         await navigator.clipboard.writeText(jsonString);
         
         showToast('JSON copied to clipboard!', 'success');
@@ -140,6 +176,21 @@ async function copyJson() {
 // ==================== Download JSON ====================
 async function downloadJson() {
     try {
+        // If data is filtered/edited only client side, just generate blob instead of API fetch
+        if (filteredData) {
+            const blob = new Blob([JSON.stringify(filteredData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'mcqs-filtered.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('Filtered JSON downloaded!', 'success');
+            return;
+        }
+
         const response = await fetch(API_BASE_URL + '/api/download/json', {
             method: 'POST',
             headers: {
@@ -177,6 +228,64 @@ async function downloadJson() {
     } catch (error) {
         console.error('Error downloading JSON:', error);
         showToast('Failed to download JSON', 'error');
+    }
+}
+
+// ==================== Interaction helpers ====================
+function attachInteractionHandlers() {
+    if (interactionInitialized) return;
+    interactionInitialized = true;
+    // delegate to grid
+    mcqGrid.addEventListener('click', onGridClick);
+    mcqGrid.addEventListener('dblclick', onGridDblClick);
+    mcqGrid.addEventListener('blur', onGridBlur, true);
+}
+
+function onGridClick(event) {
+    const opt = event.target.closest('.mcq-option');
+    if (opt) {
+        // toggle correct answer for this question
+        const qidx = parseInt(opt.dataset.qindex, 10);
+        const oidx = parseInt(opt.dataset.optindex, 10);
+        if (!isNaN(qidx) && !isNaN(oidx) && mcqData && mcqData[qidx]) {
+            // update data
+            mcqData[qidx].correct_answer = oidx;
+            // re-render only this card
+            displayMCQs(filteredData || mcqData);
+            showToast('Correct answer updated', 'success');
+        }
+    }
+}
+
+function onGridDblClick(event) {
+    const el = event.target;
+    if (el.classList.contains('mcq-question') || el.classList.contains('mcq-option')) {
+        el.contentEditable = true;
+        el.classList.add('editing');
+        el.focus();
+    }
+}
+
+function onGridBlur(event) {
+    const el = event.target;
+    if (el.classList.contains('editing')) {
+        el.contentEditable = false;
+        el.classList.remove('editing');
+        // update underlying data
+        const qidx = parseInt(el.dataset.qindex, 10);
+        if (!isNaN(qidx) && mcqData && mcqData[qidx]) {
+            if (el.classList.contains('mcq-question')) {
+                // remove leading number and dot
+                const txt = el.textContent.replace(/^\d+\.\s*/, '');
+                mcqData[qidx].question = txt;
+            } else if (el.classList.contains('mcq-option')) {
+                const oidx = parseInt(el.dataset.optindex, 10);
+                if (!isNaN(oidx)) {
+                    mcqData[qidx].options[oidx] = el.textContent;
+                }
+            }
+            showToast('Change saved locally', 'info');
+        }
     }
 }
 

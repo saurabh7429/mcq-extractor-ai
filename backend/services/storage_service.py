@@ -5,6 +5,7 @@ import logging
 from pathlib import Path
 from typing import List
 from werkzeug.datastructures import FileStorage
+import os
 
 # Create logger
 logger = logging.getLogger(__name__)
@@ -18,7 +19,7 @@ class StorageService:
         from backend.config import Config
         self.upload_folder = Config.UPLOAD_FOLDER
         self.json_folder = Config.JSON_OUTPUT_FOLDER
-        logger.info("Storage Service initialized")
+        logger.info(f"Storage Service initialized. Upload folder: {self.upload_folder}")
     
     def save_upload(self, file: FileStorage, filename: str) -> Path:
         """

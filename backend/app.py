@@ -102,7 +102,7 @@ def create_app(config_name: str = None):
         return jsonify({
             'status': 'healthy',
             'service': 'MCQ Extractor AI',
-            'version': '1.0.0'
+            'version': '2.0.0'
         }), 200
     
     # Serve frontend - root route
@@ -171,7 +171,11 @@ def ensure_directories(app):
     ]
     
     for directory in directories:
-        directory.mkdir(parents=True, exist_ok=True)
+        try:
+            directory.mkdir(parents=True, exist_ok=True)
+            app.logger.debug(f"Directory ensured: {directory}")
+        except Exception as e:
+            app.logger.warning(f"Could not create directory {directory}: {e}")
     
     app.logger.debug("All required directories created")
 
