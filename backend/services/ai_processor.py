@@ -10,7 +10,7 @@ from typing import List, Dict, Any
 logger = logging.getLogger(__name__)
 
 # Chunk size for large texts
-CHUNK_SIZE = 10000
+CHUNK_SIZE = 15000
 MAX_RETRIES = 3
 
 
@@ -79,27 +79,34 @@ class AIProcessor:
         return self._parse_response(response.text)
     
     def _create_extraction_prompt(self, text: str) -> str:
-        """Create structured prompt for MCQ extraction."""
-        return f"""You are an expert at extracting multiple choice questions (MCQs) from educational text.
+        """Create structured prompt for MCQ extraction from table format."""
+        # Limit text to avoid timeout - take first 8000 chars
+        text_sample = text[:12000]
+        
+        return f"""You are an expert at extracting multiple choice questions (MCQs) from educational documents.
 
-TASK: Extract ONLY genuine MCQs that already exist in the text below. DO NOT create new MCQs.
+TASK: Extract ONLY genuine MCQs from the table/text below.
+
+IMPORTANT TABLE FORMAT:
+The PDF may have MCQs in table format with columns: No, Question, Option1, Option2, Option3, Option4
+Look for patterns like:
+- Question followed by A) B) C) D) or Option A B C D
+- Numbers followed by question text and 4 options
 
 STRICT RULES:
 1. Only extract MCQs that are PRESENT in the text
 2. Each question must have exactly 4 options (A, B, C, D)
-3. The correct_answer must be the index of the correct option (0-3)
+3. The correct_answer must be the INDEX of the correct option (0=A, 1=B, 2=C, 3=D)
 4. Output ONLY valid JSON array, no other text
-5. If no MCQs exist in the text, return an empty array []
+5. If no MCQs exist, return empty array []
 
 Format (MUST follow exactly):
-[{{"question": "Question text here", "options": ["Option A", "Option B", "Option C", "Option D"], "correct_answer": 0}}]
+[{{"question": "Question text", "options": ["Option A", "Option B", "Option C", "Option D"], "correct_answer": 0}}]
 
-Note: correct_answer is the INDEX (0=A, 1=B, 2=C, 3=D)
+Text to analyze (first 8000 chars):
+{text_sample}
 
-Text to analyze:
-{text}
-
-Now extract MCQs (JSON only):"""
+Now extract MCQs as JSON only:"""
     
     def _parse_response(self, response_text: str) -> List[Dict[str, Any]]:
         """Parse AI response to extract MCQs."""

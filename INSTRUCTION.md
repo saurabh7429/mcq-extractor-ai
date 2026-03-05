@@ -1,18 +1,49 @@
-# MCQ Extractor AI - Complete Guide
+instructions -{
+   
+   i will uploaded frontend on github and backend on render.com so update like that so project run properly after deployment and also update the links of frontend and backend in this file and also update the link of github repository in this file
 
-## Project Overview
+   update this file every time when promting with ai 
+   update version of project and date of update
+   at home page show last update time and version of project
+   before work read this file 
+   and after work add new lines of update into this file 
+   always write in this file what you have done in this project and what you have added or changed in the project
+   when you are adding new features or changing existing features then write in this file about that feature and how it is working and what is the use of that feature
+   update change log in this file and also update the version of project in this file
+   update instruction also in this file and write about how to use the project and how to deploy the project and how to test the project and also write about the architecture of the project and also write about the pros and cons of the project and also write about the deployment diagram of the project and also write about the additional notes of the project
+}
 
-This is a full-stack AI application that extracts MCQs from PDF files.
+# MCQ Extractor AI - Complete Project Manual
+
+**Last Updated:** March 5, 2026  
+**Version:** 2.0.0 (Interactive UI)  
+**Status:** Production Ready
 
 ---
 
-## 🔗 Links
+## 🎯 Project Overview
 
-| Service | URL | Description |
-|---------|-----|-------------|
-| **Frontend (GitHub Pages)** | https://saurabh7429.github.io/mcq-extractor-ai/ | User Interface |
-| **Backend (Render)** | https://mcq-extractor-backend.onrender.com | API Server |
-| **GitHub Repository** | https://github.com/saurabh7429/MCQ-extractor-ai | Source Code |
+**MCQ Extractor AI** is a sophisticated full-stack web application that automatically extracts multiple-choice questions (MCQs) from PDF documents using AI (Google Gemini). The app features:
+- ✅ Drag-and-drop PDF upload with validation
+- ✅ AI-powered MCQ extraction from text-based PDFs
+- ✅ Interactive preview with search/filter functionality
+- ✅ Inline editing of questions and options
+- ✅ Toggle correct answers with one click
+- ✅ Download extracted MCQs as JSON
+- ✅ Clipboard copy functionality
+- ✅ Toast notifications and progress tracking
+- ✅ SQLite database for metadata persistence
+- ✅ Responsive design (mobile & desktop)
+
+---
+
+## 🔗 Live Deployment Links
+
+| Service | URL | Features |
+|---------|-----|----------|
+| **Frontend (GitHub Pages)** | https://saurabh7429.github.io/mcq-extractor-ai/ | Interactive UI hosted on GitHub |
+| **Backend (Render)** | https://mcq-extractor-backend.onrender.com | Python Flask API on Render cloud |
+| **GitHub Repository** | https://github.com/saurabh7429/MCQ-extractor-ai | Full source code & documentation |
 
 ---
 
@@ -26,19 +57,19 @@ This is a full-stack AI application that extracts MCQs from PDF files.
 │   FRONTEND (GitHub Pages)                                   │
 │   ────────────────────                                      │
 │   • Location: github.io                                     │
-│   • Files: index.html, preview.html                        │
+│   • Files: index.html, preview.html                         │
 │   • Purpose: User Interface                                 │
-│   • Tech: HTML, CSS, JavaScript                           │
+│   • Tech: HTML, CSS, JavaScript                             │
 │                                                             │
-│         │                                                    │
+│         │                                                   │
 │         │ API Calls                                         │
          ▼                                                    │
-│   BACKEND (Render.com)                                     │
+│   BACKEND (Render.com)                                      │
 │   ────────────────────                                      │
-│   • Location: render.com (Cloud Server)                    │
+│   • Location: render.com (Cloud Server)                     │
 │   • Files: backend/ folder                                  │
-│   • Purpose: PDF Processing & AI Extraction                │
-│   • Tech: Python Flask, Gemini AI                          │
+│   • Purpose: PDF Processing & AI Extraction                 │
+│   • Tech: Python Flask, Gemini AI                           │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -181,11 +212,10 @@ Place these in project root for testing:
 For issues:
 1. Check Render backend logs
 2. Verify GEMINI_API_KEY is set
-3. Ensure PDF has selectable text
+3. Ensure PDF has selectable text and images
 4. Check internet connection
 
 ---
 
 **Last Updated:** March 2026
 **Version:** 2.0.0
-
