@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MCQ Preview - MCQ Extractor AI</title>
-    <meta name="description" content="Preview your extracted multiple choice questions">
+    <title>MCQ Extractor AI - Extract MCQs from PDF</title>
+    <meta name="description" content="AI-powered tool to extract multiple choice questions from PDF files instantly using advanced LLM technology.">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,14 +21,14 @@
     <div class="app-wrapper">
         <!-- Header -->
         <header class="header">
-                <div class="container">
+            <div class="container">
                 <div class="header-content">
                     <a href="/" class="header-brand">
                         <svg class="header-logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="40" height="40" rx="8" fill="url(#logo-gradient-preview)"/>
+                            <rect width="40" height="40" rx="8" fill="url(#logo-gradient)"/>
                             <path d="M12 28V12h4l4 8 4-8h4v16h-4V18l-4 8-4-8v10h-4z" fill="white"/>
                             <defs>
-                                <linearGradient id="logo-gradient-preview" x1="0" y1="0" x2="40" y2="40">
+                                <linearGradient id="logo-gradient" x1="0" y1="0" x2="40" y2="40">
                                     <stop stop-color="#4f46e5"/>
                                     <stop offset="1" stop-color="#7c3aed"/>
                                 </linearGradient>
@@ -51,8 +51,6 @@
                             </svg>
                         </button>
                     </div>
-                </div>
-            </div>
         </header>
 
         <!-- Main Content -->
@@ -61,91 +59,111 @@
                 <!-- Hero Section -->
                 <section class="hero">
                     <h1 class="hero-title">
-                        <span class="hero-title-gradient">Preview</span> Your MCQs
+                        Extract <span class="hero-title-gradient">MCQs</span> from Any PDF
                     </h1>
                     <p class="hero-description">
-                        Review your extracted multiple choice questions. Copy or download the JSON format for use in your quiz application.
+                        Upload your PDF document and let AI extract all multiple choice questions instantly. 
+                        Supports 20+ question formats with accurate answer detection.
                     </p>
                 </section>
 
                 <!-- Progress Steps -->
                 <div class="progress-steps">
-                    <div class="progress-step completed" id="step1">
+                    <div class="progress-step active" id="step1">
                         <span class="progress-step-number">1</span>
                         <span class="progress-step-label">Upload</span>
                     </div>
-                    <div class="progress-step completed" id="step2">
+                    <div class="progress-step" id="step2">
                         <span class="progress-step-number">2</span>
                         <span class="progress-step-label">Process</span>
                     </div>
-                    <div class="progress-step active" id="step3">
+                    <div class="progress-step" id="step3">
                         <span class="progress-step-number">3</span>
-                        <span class="progress-step-label">Preview</span>
+                        <span class="progress-step-label">Download</span>
                     </div>
-                </div>
 
-                <!-- Preview Card -->
+                <!-- Upload Card -->
                 <section class="upload-card">
-                    <!-- Preview Stats -->
-                    <div class="preview-stats" id="previewStats">
-                        <h2>Loading...</h2>
-                        <p>Please wait while we load your MCQs</p>
+                    <!-- Drop Zone -->
+                    <div class="drop-zone" id="dropZone">
+                        <div class="drop-zone-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                        </div>
+                        <h3 class="drop-zone-title">Drop your PDF here</h3>
+                        <p class="drop-zone-text">or click to browse files</p>
+                        <span class="drop-zone-hint">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            PDF files only (Max 10MB)
+                        </span>
+                        <input type="file" id="fileInput" class="file-input" accept=".pdf,application/pdf">
                     </div>
 
-                    <!-- Action Buttons -->
+                    <!-- File Preview -->
+                    <div id="selectedFile" class="file-preview hidden">
+                        <div class="file-preview-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                        </div>
+                        <div class="file-preview-info">
+                            <div class="file-preview-name" id="fileName">filename.pdf</div>
+                            <div class="file-preview-size" id="fileSize">0 KB</div>
+                        <button class="file-preview-remove" id="removeFile" title="Remove file">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Upload Button -->
                     <div class="btn-group">
-                        <button class="btn btn-primary" id="copyJsonBtn">
+                        <button class="btn btn-primary btn-lg" id="uploadBtn" disabled>
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                             </svg>
-                            Copy JSON
-                        </button>
-                        <button class="btn btn-success" id="downloadJsonBtn">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                            </svg>
-                            Download JSON
-                        </button>
-                        <button class="btn btn-secondary" id="backBtn">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                            </svg>
-                            Upload More
+                            Upload & Extract MCQs
                         </button>
                     </div>
 
                     <!-- Error Message -->
-                    <div id="errorContainer" class="error-message hidden">
+                    <div id="errorMessage" class="error-message hidden">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <div class="error-content">
-                            <span class="error-text" id="errorText">An error occurred</span>
+                            <span class="error-text" id="errorText"></span>
+                            <small class="error-suggestion" id="errorSuggestion"></small>
                         </div>
-                    </div>
                 </section>
 
-                <!-- Loading Container -->
-                <div id="loadingContainer" class="loading-container hidden">
-                    <div class="loading-spinner"></div>
-                    <h3 class="loading-title" id="loadingTitle">Loading MCQs...</h3>
-                    <p class="loading-subtitle" id="loadingSubtitle">Retrieving your extracted questions</p>
-                    <div class="progress-bar">
-                        <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
-                    </div>
-                </div>
+                <!-- Status Section -->
+                <section class="status-section" id="statusSection">
+                    <!-- Loading -->
+                    <div id="loadingSpinner" class="loading-container hidden">
+                        <div class="loading-spinner"></div>
+                        <h3 class="loading-title" id="loadingTitle">Processing your PDF...</h3>
+                        <p class="loading-subtitle" id="loadingSubtitle">Extracting MCQs using AI</p>
+                        <div class="progress-bar">
+                            <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
 
-                <!-- MCQ Section -->
-                <section class="mcq-section hidden" id="mcqSection">
-                    <div class="mcq-section-header">
-                        <h2 class="mcq-section-title">Extracted MCQs</h2>
-                        <span class="mcq-section-count" id="mcqCount">0 Questions</span>
-                    </div>
-                    
-                    <!-- MCQ Grid -->
-                    <div class="mcq-grid" id="mcqGrid">
-                        <!-- MCQ cards will be dynamically inserted here -->
-                    </div>
+                    <!-- Status Messages -->
+                    <div id="statusMessages"></div>
+
+                    <!-- Success -->
+                    <div id="successMessage" class="status-message status-message-success hidden">
+                        <div class="status-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        <div class="status-content">
+                            <strong class="status-title">Extraction Complete!</strong>
+                            <p class="status-description">Your MCQs are ready to view</p>
+                        </div>
                 </section>
             </div>
         </main>
@@ -156,10 +174,10 @@
                 <div class="footer-content">
                     <div class="footer-brand">
                         <svg class="footer-logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="40" height="40" rx="8" fill="url(#footer-logo-gradient-preview)"/>
+                            <rect width="40" height="40" rx="8" fill="url(#footer-logo-gradient)"/>
                             <path d="M12 28V12h4l4 8 4-8h4v16h-4V18l-4 8-4-8v10h-4z" fill="white"/>
                             <defs>
-                                <linearGradient id="footer-logo-gradient-preview" x1="0" y1="0" x2="40" y2="40">
+                                <linearGradient id="footer-logo-gradient" x1="0" y1="0" x2="40" y2="40">
                                     <stop stop-color="#4f46e5"/>
                                     <stop offset="1" stop-color="#7c3aed"/>
                                 </linearGradient>
@@ -173,8 +191,6 @@
                         <span class="footer-version">Last Updated: 2026-03-08</span>
                         <span class="footer-version">Model: Llama 3.1 8B</span>
                     </div>
-                </div>
-            </div>
         </footer>
     </div>
 
@@ -182,8 +198,8 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- Scripts -->
-    <script src="js/preview.js"></script>
-    <script src="js/download.js"></script>
+    <script src="js/upload.js"></script>
+    <script src="js/status.js"></script>
     
     <!-- Theme Toggle Script -->
     <script>
@@ -214,4 +230,3 @@
     </script>
 </body>
 </html>
-
