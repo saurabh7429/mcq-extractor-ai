@@ -1,0 +1,171 @@
+perform this prompt {
+    abhi bhi galat answer de rha h theek kro ise ya iski testing khud kro testmcq.pdf aur testmcq2.pdf ke according testing kro aur sahi answer do
+}
+always read details from this file while updating 
+always append prompt with new details from this file
+add update time to the prompt
+last update time into home page 
+always update version with every success promt when project work properly 
+take instructions from this file and perform the task accordingly
+ill upload my project on github in future so made code in such a way that it can be easily uploaded and maintained on github
+ill upload backend code on render.com by github integration in future so made code in such a way that it can be easily uploaded and maintained on render.com
+delete every test file or any other file that you created while performing the task and not required for the project after completion of the task 
+do testing with the provided test files (mcq_testing_20_formats.pdf ) and ensure that the output is correct according to the requirements mentioned in the instruction file
+
+
+details:
+API Key Setup Instructions:
+1. Go to https://console.groq.com/keys
+2. Create a new API key
+3. Add it to the .env file like: GROQ_API_KEY=your_key_here
+4. Restart the server
+
+previous promt and time -{
+    sari requirements download karo is project ke liye - 2024-06-01 10:00:00
+
+}
+
+previous promt and time -{
+    GROQ API key setup, Version 2.0.0 update, Requirements installed - 2025-02-26 12:00:00
+
+}
+
+previous promt and time -{
+    Fixed answer format issue (string to index conversion) - 2025-02-26 14:00:00
+
+}
+
+previous promt and time -{
+    Fixed JSONFormatter to output correct_answer as index, Version 2.0.2 - 2025-02-26 16:30:00
+
+}
+
+apni api key kaha rakhu uske liye tumne jagah banai hi nhi
+
+previous promt and time -{
+    Production version setup - Llama 3.3 70B model, Version 2.1.0 - 2025-02-26 17:00:00
+
+}
+
+previous promt and time -{
+    Fixed rate limit issue - increased chunk size to 40000, reduced retries to 2, added wait time on 429 errors - Version 2.1.1 - 2026-03-06 17:00:00
+
+}
+
+previous promt and time -{
+    Added proper error handling for rate limit, now shows clear message to create new API key - Version 2.1.2 - 2026-03-06 17:10:00
+
+}
+
+previous promt and time -{
+    Changed model to llama-3.1-8b-instant (more quota), Added caching to prevent duplicate API calls, Added quota reset time in error message - Version 2.1.3 - 2026-03-06 17:30:00
+
+}
+
+previous promt and time -{
+    Combined upload + extract in single API call, Added GITHUB_UPLOAD_GUIDE.md for render.com deployment - Version 2.1.4 - 2026-03-06 18:00:00
+
+}
+
+previous promt and time -{
+    Improve the MCQ extraction system for my MCQ-extractor-ai project.
+
+The system extracts MCQs from PDFs and returns JSON.
+
+Requirements:
+
+1. Extract MCQs from text in different formats:
+   - Standard MCQ format
+   - Inline MCQ format (A) option1 (B) option2
+   - Table format MCQs
+   - Multiline options
+   - Different option styles: A), A., (A), a)
+
+2. Normalize options:
+   - Remove option labels like A), B), (A), etc.
+   - Options array must contain only the option text.
+
+Example:
+
+Input:
+A) Apple
+B) Microsoft
+C) Google
+D) IBM
+
+Output:
+"options": ["Apple","Microsoft","Google","IBM"]
+
+3. Ensure options always contain full text.
+Never return ["A","B","C","D"].
+
+4. Correct answer handling:
+   - If the correct answer is explicitly present in the text, detect it.
+   - If the correct answer is NOT present, intelligently generate the correct answer using reasoning.
+
+5. Correct answer must be returned as an index:
+
+0 → option A
+1 → option B
+2 → option C
+3 → option D
+
+Example:
+
+{
+ "question": "Which language runs in a web browser?",
+ "options": ["Python","Java","C","JavaScript"],
+ "correct_answer": 3
+}
+
+6. If generating answers:
+   - Choose the most logically correct option.
+   - Do not randomly guess.
+   - Use basic knowledge reasoning.
+
+7. Handle image questions:
+   - If OCR extracts text from images, process it.
+   - If image text is unclear, skip answer generation.
+
+8. Validation rules:
+   - Each MCQ must have exactly 4 options.
+   - Remove duplicates.
+   - Remove empty options.
+
+9. Output format must always be valid JSON:
+
+[
+ {
+  "question": "text",
+  "options": ["option1","option2","option3","option4"],
+  "correct_answer": 0
+ }
+]
+
+10. Improve post-processing in json_formatter.py to ensure:
+    - options contain only text
+    - correct_answer index matches the correct option
+    - malformed MCQs are filtered.
+
+Goal:
+Produce clean MCQ JSON that can be directly used in a quiz application. - Version 2.2.0 - 2025-03-06
+
+}
+
+previous promt and time -{
+    Optimized the extraction pipeline to reduce LLM token usage:
+    - Changed chunk size from 40000 to 1500-2500 characters
+    - Added intelligent chunking that splits at natural boundaries (paragraphs, question marks)
+    - Sends each chunk to LLM separately for MCQ extraction
+    - Merges MCQs from all chunks and removes duplicates
+    - Maintains original MCQ order when possible
+    - Added intelligent correct_answer inference for missing answers (instead of skipping MCQs)
+    - Never skip MCQs - infer answer using reasoning if missing
+    - Default to index 0 only if cannot infer (rare cases)
+    - Improved deduplication: Only removes duplicates if BOTH question AND options are identical
+    - Version 2.3.2 - 2026-03-08
+}
+
+
+
+
