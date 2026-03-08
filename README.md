@@ -1,192 +1,242 @@
-# MCQ Extractor AI 🤖📝
+# 🤖 MCQ Extractor AI
 
-AI-powered tool to extract MCQs from PDF files using Gemini AI.
+### Turn Your PDF Questions into Digital MCQs in Seconds!
 
-![Python](https://img.shields.io/badge/Python-3.10+-blue)
-![Flask](https://img.shields.io/badge/Flask-3.0+-green)
-![License](https://img.shields.io/badge/License-MIT-yellow)
-
-## Features
-
-- 📄 **PDF to MCQ Conversion** - Extract multiple choice questions from PDF files
-- 🤖 **AI-Powered** - Uses Google Gemini AI for intelligent extraction
-- 🎯 **High Accuracy** - Precise question, options, and answer extraction
-- 🌐 **Web Interface** - User-friendly frontend for easy interaction
-- 📊 **Database Storage** - SQLite database for storing MCQs
-- 🔒 **Secure** - Environment-based API key management
-
-## Demo
-
-[Add your deployed website URL here]
-
-## Tech Stack
-
-- **Backend:** Python, Flask
-- **AI:** Google Gemini API
-- **Database:** SQLite
-- **Frontend:** HTML, CSS, JavaScript
-- **PDF Processing:** PyPDF2, pdfplumber
-
-## Getting Started
-
-### Prerequisites
-
-- Python 3.10 or higher
-- GitHub Account
-- Gemini API Key (Free from https://aistudio.google.com/app/apikey)
-
-### Installation
-
-1. **Clone the repository:**
-   
-```
-bash
-   git clone https://github.com/YOUR_USERNAME/MCQ-extractor-ai.git
-   cd MCQ-extractor-ai
-   
-```
-
-2. **Create virtual environment:**
-   
-```
-bash
-   python -m venv venv
-   venv\Scripts\activate  # Windows
-   # source venv/bin/activate  # Linux/Mac
-   
-```
-
-3. **Install dependencies:**
-   
-```
-bash
-   pip install -r requirements.txt
-   
-```
-
-4. **Setup environment variables:**
-   
-```
-bash
-   copy .env.example .env
-   # Edit .env and add your GEMINI_API_KEY
-   
-```
-
-5. **Run the application:**
-   
-```
-bash
-   python run.py
-   
-```
-
-6. **Open in browser:**
-   
-```
-   http://localhost:5000
-   
-```
-
-## Usage
-
-1. Open the web interface
-2. Click on the upload area or drag & drop a PDF file
-3. Click "Upload & Extract" button
-4. Wait for AI processing
-5. Preview and download your MCQs in JSON format
-
-## Project Structure
-
-```
-MCQ-extractor-ai/
-├── backend/
-│   ├── app.py              # Flask application
-│   ├── config.py           # Configuration
-│   ├── routes/             # API routes
-│   │   ├── upload.py       # File upload
-│   │   ├── extract.py      # MCQ extraction
-│   │   └── download.py     # File download
-│   ├── services/           # Business logic
-│   ├── models/             # Database models
-│   └── utils/              # Utilities
-├── frontend/
-│   ├── index.html          # Main page
-│   ├── preview.html        # Preview page
-│   ├── css/                # Styles
-│   └── js/                 # Frontend scripts
-├── storage/                # File storage
-├── database/               # SQLite database
-├── logs/                   # Application logs
-├── requirements.txt        # Python dependencies
-└── run.py                  # Entry point
-```
-
-## API Endpoints
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/upload/file` | POST | Upload PDF file |
-| `/api/extract/<file_id>` | GET | Extract MCQs from file |
-| `/api/download/<file_id>` | GET | Download JSON file |
-| `/api/health` | GET | Health check |
-
-## Deployment
-
-### Deploy to Vercel (Frontend + API)
-
-1. Push code to GitHub
-2. Go to https://vercel.com
-3. Import your repository
-4. Set environment variables:
-   - `GEMINI_API_KEY` = your-api-key
-   - `SECRET_KEY` = random-string
-5. Deploy!
-
-### Deploy to Render
-
-1. Push code to GitHub
-2. Go to https://render.com
-3. Create new Web Service
-4. Connect GitHub repo
-5. Set environment variables
-6. Deploy!
-
-## Environment Variables
-
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `GEMINI_API_KEY` | Google Gemini API Key | Yes |
-| `SECRET_KEY` | Flask secret key | No |
-| `FLASK_ENV` | production/development | No |
-| `LOG_LEVEL` | INFO/DEBUG | No |
-
-## Security
-
-- ✅ API keys stored in environment variables
-- ✅ .env file in .gitignore (never uploaded)
-- ✅ File type validation
-- ✅ File size limits (10MB max)
-- ✅ Secure filename handling
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License.
-
-## Acknowledgments
-
-- [Google Gemini AI](https://gemini.google.com/)
-- [Flask](https://flask.palletsprojects.com/)
-- [PyPDF2](https://pypdf2.readthedocs.io/)
+![Python](https://img.shields.io/badge/Python-3.10+-blue?style=for-the-badge)
+![Flask](https://img.shields.io/badge/Flask-3.0+-green?style=for-the-badge)
+![AI](https://img.shields.io/badge/AI-GROQ-purple?style=for-the-badge)
+![Live](https://img.shields.io/badge/Live-Render-brightgreen?style=for-the-badge)
 
 ---
 
-Made with ❤️ for education
+## ✨ What Does This Do?
+
+Ever had a PDF with 100+ MCQs and wished you had them in a digital format? 
+
+**MCQ Extractor AI** does exactly that! 
+- Upload a PDF 📄
+- AI reads and extracts all questions 🎯
+- Get JSON with questions, options & correct answers 📝
+- Download or preview instantly 🚀
+
+---
+
+## 🎯 Live Demo
+
+**Try it now:** 👉 [https://mcq-extractor-ai.onrender.com](https://mcq-extractor-ai.onrender.com)
+
+*(Works on mobile too!)*
+
+---
+
+## 🚀 Features
+
+| Feature | Description |
+|---------|-------------|
+| 🤖 **AI-Powered** | Uses GROQ's Llama 3.1 model for smart extraction |
+| 📄 **PDF Support** | Extract from text-based PDFs |
+| 🎯 **Accurate** | Gets questions, 4 options & correct answers |
+| 🌐 **Web Based** | No installation needed - runs in browser |
+| 💾 **JSON Export** | Download MCQs in standard JSON format |
+| 🔒 **Secure** | Your files stay on server, deleted after processing |
+
+---
+
+## 🛠️ Tech Stack
+
+```
+┌─────────────────────────────────────────────────────┐
+│                    FRONTEND                         │
+│   HTML5  •  CSS3  •  JavaScript (Vanilla)         │
+└─────────────────────────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────┐
+│                    BACKEND                          │
+│   Python  •  Flask  •  GROQ API (Llama 3.1)       │
+└─────────────────────────────────────────────────────┘
+                          │
+          ┌───────────────┼───────────────┐
+          ▼               ▼               ▼
+     ┌─────────┐    ┌──────────┐    ┌──────────┐
+     │  pypdf  │    │  SQLite  │    │ gunicorn │
+     │ (Reader)│    │    DB    │    │  Server  │
+     └─────────┘    └──────────┘    └──────────┘
+```
+
+---
+
+## 📸 How It Works
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Upload    │────►│    AI       │────►│  Download   │
+│     PDF     │     │  Processes  │     │     JSON    │
+└─────────────┘     └─────────────┘     └─────────────┘
+     1 click          5-30 sec            Done!
+```
+
+### Step-by-Step:
+1. **Drop your PDF** - Drag & drop or click to upload
+2. **AI Magic** - Llama 3.1 reads and extracts questions
+3. **Preview** - See all MCQs on screen
+4. **Download** - Get JSON file instantly
+
+---
+
+## 🏃‍♂️ Quick Start (Local)
+
+```bash
+# 1. Clone the repo
+git clone https://github.com/saurabh7429/mcq-extractor-ai.git
+cd mcq-extractor-ai
+
+# 2. Create virtual environment
+python -m venv venv
+
+# 3. Activate (Windows)
+venv\Scripts\activate
+
+# 4. Install dependencies
+pip install -r requirements.txt
+
+# 5. Setup API key
+copy .env.example .env
+# Edit .env and add: GROQ_API_KEY=your_key_here
+# Get free key: https://console.groq.com/keys
+
+# 6. Run!
+python run.py
+
+# 7. Open browser
+http://localhost:5000
+```
+
+---
+
+## 📁 Project Structure
+
+```
+mcq-extractor-ai/
+│
+├── 🖥️  frontend/          # Web UI (HTML/CSS/JS)
+│   ├── index.html         # Upload page
+│   ├── preview.html      # Results page
+│   ├── css/styles.css    # Beautiful styling
+│   └── js/               # Client-side scripts
+│
+├── ⚙️   backend/          # Server (Python/Flask)
+│   ├── app.py            # Main Flask app
+│   ├── routes/           # API endpoints
+│   │   ├── upload.py     # Handle file upload
+│   │   ├── extract.py    # MCQ extraction
+│   │   └── download.py   # JSON download
+│   ├── services/          # Core logic
+│   │   ├── ai_processor.py    # GROQ AI integration
+│   │   ├── pdf_reader.py      # PDF text extraction
+│   │   └── json_formatter.py  # Format output
+│   └── models/           # Database
+│
+├── 💾  storage/           # File storage
+│   ├── uploaded_pdfs/     # Uploaded PDFs
+│   └── generated_json/   # Output JSON files
+│
+├── 📊  database/          # SQLite database
+├── 📝  requirements.txt   # Python packages
+└── 🚀  render.yaml       # Deploy config
+```
+
+---
+
+## 🔑 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/upload/file` | POST | Upload PDF |
+| `/api/extract/<file_id>` | POST | Extract MCQs |
+| `/api/download/<filename>` | GET | Download JSON |
+| `/api/health` | GET | Server health check |
+
+---
+
+## 🌐 Deployment
+
+### Deploy to Render (Free!)
+
+1. **Push to GitHub**
+```bash
+git add .
+git commit -m "Ready to deploy"
+git push origin main
+```
+
+2. **Go to [render.com](https://render.com)**
+- New → Web Service
+- Connect your GitHub repo
+- Configure:
+  - Build: `pip install -r requirements.txt`
+  - Start: `gunicorn backend.app:app --workers 4 --bind 0.0.0.0:$PORT`
+
+3. **Add Environment Variable:**
+- `GROQ_API_KEY` = your key from https://console.groq.com/keys
+
+4. **Done!** 🎉 Your app is live!
+
+---
+
+## ❓ FAQ
+
+**Q: Is it free?**
+> Yes! GROQ provides free tier with generous limits. No credit card needed.
+
+**Q: What PDFs work?**
+> Text-based PDFs (not scanned images). If you can select text in PDF, it will work!
+
+**Q: Where are files stored?**
+> Files are stored temporarily and deleted after processing. Nothing is kept permanently.
+
+**Q: Can I use on mobile?**
+> Absolutely! The UI is fully responsive.
+
+---
+
+## 🤝 Contributing
+
+Found a bug? Have a feature idea?
+
+1. Fork the repo
+2. Create your feature branch
+3. Make changes and test
+4. Submit a Pull Request
+
+---
+
+## 📜 License
+
+MIT License - Free to use, modify, and distribute!
+
+---
+
+## ⭐ Show Support
+
+If this project helped you, give it a ⭐ on GitHub!
+
+---
+
+## 🔗 Quick Links
+
+- **Live App:** https://mcq-extractor-ai.onrender.com
+- **GROQ API:** https://console.groq.com/keys
+- **Render Deploy:** https://render.com
+
+---
+
+<div align="center">
+
+Made with ❤️ using Flask + GROQ AI
+
+*Turn boring PDFs into awesome digital quizzes!* 🎉
+
+</div>
+
+
