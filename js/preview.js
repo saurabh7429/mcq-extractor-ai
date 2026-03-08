@@ -16,14 +16,15 @@ const API_BASE_URL = (function() {
 // Get base path for redirects (works with sub-directory hosting like GitHub Pages)
 const BASE_PATH = (function() {
     const path = window.location.pathname;
-    // Remove trailing slash and get the base path
-    // For /mcq-extractor-ai/index.html, basePath would be /mcq-extractor-ai/
-    // For /index.html, basePath would be /
-    const lastSlash = path.lastIndexOf('/');
-    if (lastSlash === 0) {
-        return '/';
+    if (path === '/' || path === '') return '/';
+    // Remove trailing slash if present
+    let base = path.endsWith('/') ? path.slice(0, -1) : path;
+    // Get the repo name from the path
+    const parts = base.split('/');
+    if (parts.length > 1 && parts[1]) {
+        return '/' + parts[1] + '/';
     }
-    return path.substring(0, lastSlash + 1);
+    return '/';
 })();
 
 const EXPORT_FORMATS = [

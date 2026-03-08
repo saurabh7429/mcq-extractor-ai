@@ -24,7 +24,7 @@
             <div class="container">
                 <div class="header-content">
                     <!-- Using onclick with dynamic BASE_PATH for subdirectory support on GitHub Pages -->
-                    <a href="#" class="header-brand" onclick="event.preventDefault(); window.location.href = (function(){ var p=window.location.pathname; var i=p.lastIndexOf('/'); return i===0?'/':p.substring(0,i+1); })() + 'index.html';">
+                    <a href="#" class="header-brand" onclick="event.preventDefault(); window.location.href = (function(){ var p=window.location.pathname; if(p==='/'||p==='')return'/'; var b=p.endsWith('/')?p.slice(0,-1):p; var parts=b.split('/'); return parts.length>1&&parts[1]?'/'+parts[1]+'/':'/'; })() + 'index.html';">
                         <svg class="header-logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <rect width="40" height="40" rx="8" fill="url(#logo-gradient)"/>
                             <path d="M12 28V12h4l4 8 4-8h4v16h-4V18l-4 8-4-8v10h-4z" fill="white"/>
