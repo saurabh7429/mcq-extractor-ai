@@ -17,8 +17,9 @@ def download_json_by_id(file_id: str):
     logger.info(f"Download request for file_id: {file_id}")
     try:
         storage = StorageService()
-        file_path = storage.get_json_by_uuid(file_id)
-        if not file_path:
+        # Use get_json_path to get the actual file path, not the content
+        file_path = storage.get_json_path(f"{file_id}.json")
+        if not file_path.exists():
             return jsonify({'success': False, 'message': 'File not found', 'file_id': file_id}), 404
         filename = file_path.name
         return send_file(file_path, mimetype='application/json', as_attachment=True, download_name=filename)

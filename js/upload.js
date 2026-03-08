@@ -286,7 +286,7 @@ async function uploadFile() {
 
         // Redirect to preview page after short delay
         setTimeout(() => {
-            window.location.href = 'preview.html';
+            window.location.href = '/preview';
         }, 1500);
 
     } catch (error) {

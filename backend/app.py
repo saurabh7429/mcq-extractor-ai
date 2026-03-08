@@ -110,21 +110,37 @@ def create_app(config_name: str = None):
     def serve_index():
         """Serve the main index.html page."""
         from flask import send_from_directory
-        frontend_path = Path(__file__).resolve().parent.parent / 'frontend'
-        return send_from_directory(frontend_path, 'index.html')
+        # Serve from root directory
+        root_path = Path(__file__).resolve().parent.parent
+        return send_from_directory(root_path, 'index.html')
     
-    # Serve static files from frontend
+    # Serve preview page
+    @app.route('/preview', methods=['GET'])
+    def serve_preview():
+        """Serve the preview.html page."""
+        from flask import send_from_directory
+        root_path = Path(__file__).resolve().parent.parent
+        return send_from_directory(root_path, 'preview.html')
+    
+    # Serve static files from root (js, css, images)
     @app.route('/<path:filename>', methods=['GET'])
     def serve_static(filename):
-        """Serve static files from frontend directory."""
+        """Serve static files from root directory."""
         from flask import send_from_directory
-        frontend_path = Path(__file__).resolve().parent.parent / 'frontend'
-        # Check if it's a file in frontend directory
-        file_path = frontend_path / filename
-        if file_path.exists() and file_path.is_file():
-            return send_from_directory(frontend_path, filename)
+        root_path = Path(__file__).resolve().parent.parent
+        
+        # Check for files in root subdirectories (js, css, etc.)
+        valid_dirs = ['js', 'css', 'images', 'assets', 'logo.png']
+        
+        # If it's a known subdirectory/file, serve from there
+        for dir_name in valid_dirs:
+            if filename.startswith(dir_name + '/') or filename == dir_name:
+                file_path = root_path / filename
+                if file_path.exists() and file_path.is_file():
+                    return send_from_directory(root_path, filename)
+        
         # Otherwise serve index.html for SPA routing
-        return send_from_directory(frontend_path, 'index.html')
+        return send_from_directory(root_path, 'index.html')
     
     # Register blueprints
     register_blueprints(app)
