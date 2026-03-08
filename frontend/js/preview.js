@@ -24,7 +24,13 @@ const EXPORT_FORMATS = [
     { id: 'sql', name: 'SQL', ext: 'sql', icon: '&#128451;' },
     { id: 'aiken', name: 'Aiken', ext: 'txt', icon: '&#9989;' },
     { id: 'gift', name: 'GIFT', ext: 'txt', icon: '&#127873;' },
-    { id: 'excel', name: 'Excel', ext: 'xlsx', icon: '&#128200;' }
+    { id: 'excel', name: 'Excel', ext: 'xlsx', icon: '&#128200;' },
+    // New print-ready formats
+    { id: 'question_pdf', name: 'Question Paper PDF', ext: 'pdf', icon: '&#128196;' },
+    { id: 'answer_key_pdf', name: 'Answer Key PDF', ext: 'pdf', icon: '&#128273;' },
+    { id: 'omr_pdf', name: 'OMR Sheet PDF', ext: 'pdf', icon: '&#128203;' },
+    { id: 'tabular_pdf', name: 'Tabular PDF', ext: 'pdf', icon: '&#128202;' },
+    { id: 'docx', name: 'DOCX Question Paper', ext: 'docx', icon: '&#128462;' }
 ];
 
 let currentMcqs = [];
@@ -46,10 +52,66 @@ document.addEventListener('DOMContentLoaded', function() {
     
     loadMcqs(currentFileId);
     setupExportDropdown();
+    setupButtonHandlers();
 });
 
+function setupButtonHandlers() {
+    // Copy JSON button
+    const copyJsonBtn = document.getElementById('copyJsonBtn');
+    if (copyJsonBtn) {
+        copyJsonBtn.addEventListener('click', async function() {
+            try {
+                const response = await fetch(API_BASE_URL + '/extract/' + currentFileId);
+                if (!response.ok) throw new Error('Failed to load MCQs');
+                const data = await response.json();
+                if (data.mcqs) {
+                    await navigator.clipboard.writeText(JSON.stringify(data.mcqs, null, 2));
+                    showToast('JSON copied to clipboard!', 'success');
+                }
+            } catch (error) {
+                console.error('Copy error:', error);
+                showToast('Failed to copy: ' + error.message, 'error');
+            }
+        });
+    }
+    
+    // Download JSON button
+    const downloadJsonBtn = document.getElementById('downloadJsonBtn');
+    if (downloadJsonBtn) {
+        downloadJsonBtn.addEventListener('click', async function() {
+            try {
+                const response = await fetch(API_BASE_URL + '/download/' + currentFileId);
+                if (!response.ok) throw new Error('Failed to download');
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = currentFileId + '.json';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                showToast('JSON downloaded!', 'success');
+            } catch (error) {
+                console.error('Download error:', error);
+                showToast('Failed to download: ' + error.message, 'error');
+            }
+        });
+    }
+    
+    // Back button (Upload More)
+    const backBtn = document.getElementById('backBtn');
+    if (backBtn) {
+        backBtn.addEventListener('click', function() {
+            sessionStorage.removeItem('currentFileId');
+            sessionStorage.removeItem('currentFileName');
+            window.location.href = '/';
+        });
+    }
+}
+
 function setupExportDropdown() {
-    // Toggle dropdown visibility
+    // Toggle dropdown visibility for Export As
     const exportFormatBtn = document.getElementById('exportFormatBtn');
     const exportMenu = document.getElementById('exportMenu');
     
@@ -57,12 +119,35 @@ function setupExportDropdown() {
         exportFormatBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             exportMenu.classList.toggle('show');
+            // Close print menu if open
+            const printMenu = document.getElementById('printMenu');
+            if (printMenu) printMenu.classList.remove('show');
         });
         
         // Close dropdown when clicking outside
         document.addEventListener('click', function(e) {
             if (!exportFormatBtn.contains(e.target) && !exportMenu.contains(e.target)) {
                 exportMenu.classList.remove('show');
+            }
+        });
+    }
+    
+    // Toggle dropdown visibility for Print Formats
+    const printFormatBtn = document.getElementById('printFormatBtn');
+    const printMenu = document.getElementById('printMenu');
+    
+    if (printFormatBtn && printMenu) {
+        printFormatBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            printMenu.classList.toggle('show');
+            // Close export menu if open
+            if (exportMenu) exportMenu.classList.remove('show');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!printFormatBtn.contains(e.target) && !printMenu.contains(e.target)) {
+                printMenu.classList.remove('show');
             }
         });
     }
@@ -76,6 +161,7 @@ function setupExportDropdown() {
                 downloadInFormat(format);
                 // Close dropdown after selection
                 if (exportMenu) exportMenu.classList.remove('show');
+                if (printMenu) printMenu.classList.remove('show');
             }
         });
     });

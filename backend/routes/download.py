@@ -87,7 +87,13 @@ def export_format(format: str, file_id: str):
             'sql': ('application/sql', 'sql'),
             'aiken': ('text/plain', 'txt'),
             'gift': ('text/plain', 'txt'),
-            'excel': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx')
+            'excel': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx'),
+            # New print-ready formats
+            'question_pdf': ('application/pdf', 'pdf'),
+            'answer_key_pdf': ('application/pdf', 'pdf'),
+            'omr_pdf': ('application/pdf', 'pdf'),
+            'tabular_pdf': ('application/pdf', 'pdf'),
+            'docx': ('application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'docx')
         }
         
         mimetype, ext = format_info.get(format.lower(), ('application/json', 'json'))

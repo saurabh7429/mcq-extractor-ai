@@ -194,6 +194,264 @@ class ExportService:
             lines.append("")
         return '\n'.join(lines)
     
+    # ==================== NEW PRINT-READY FORMATS ====================
+    
+    # Question Paper PDF (questions + MCQs only, no answers)
+    def export_question_pdf(self, mcqs: List[Dict[str, Any]]) -> bytes:
+        """Export question paper as PDF without answers."""
+        try:
+            from reportlab.lib import colors
+            from reportlab.lib.pagesizes import A4
+            from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+            from reportlab.lib.units import mm
+            from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
+            from reportlab.lib.enums import TA_CENTER
+            from io import BytesIO
+            
+            buffer = BytesIO()
+            doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=20*mm, bottomMargin=20*mm,
+                                   leftMargin=20*mm, rightMargin=20*mm)
+            
+            styles = getSampleStyleSheet()
+            title_style = ParagraphStyle('CustomTitle', parent=styles['Heading1'], fontSize=18,
+                                        alignment=TA_CENTER, spaceAfter=20)
+            question_style = ParagraphStyle('Question', parent=styles['Normal'], fontSize=11,
+                                           spaceBefore=10, spaceAfter=5)
+            option_style = ParagraphStyle('Option', parent=styles['Normal'], fontSize=10,
+                                          leftIndent=20)
+            
+            story = []
+            story.append(Paragraph("Question Paper", title_style))
+            story.append(Spacer(1, 10))
+            story.append(Paragraph(f"Total Questions: {len(mcqs)}", styles['Normal']))
+            story.append(Spacer(1, 20))
+            
+            for idx, mcq in enumerate(mcqs, 1):
+                options = self._ensure_four_options(mcq.get('options', []))
+                q_text = f"<b>Q{idx}.</b> {mcq.get('question', '')}"
+                story.append(Paragraph(q_text, question_style))
+                
+                for opt_idx, option in enumerate(options):
+                    opt_text = f"{OPTION_LETTERS[opt_idx]}) {option}"
+                    story.append(Paragraph(opt_text, option_style))
+                
+                story.append(Spacer(1, 10))
+                
+                if idx % 25 == 0:
+                    story.append(PageBreak())
+            
+            doc.build(story)
+            return buffer.getvalue()
+        except ImportError:
+            raise ValueError("PDF export requires reportlab. Install with: pip install reportlab")
+    
+    # Answer Key PDF (only answers with question IDs)
+    def export_answer_key_pdf(self, mcqs: List[Dict[str, Any]]) -> bytes:
+        """Export answer key as PDF."""
+        try:
+            from reportlab.lib import colors
+            from reportlab.lib.pagesizes import A4
+            from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+            from reportlab.lib.units import mm
+            from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+            from reportlab.lib.enums import TA_CENTER
+            from io import BytesIO
+            
+            buffer = BytesIO()
+            doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=20*mm, bottomMargin=20*mm,
+                                   leftMargin=20*mm, rightMargin=20*mm)
+            
+            styles = getSampleStyleSheet()
+            title_style = ParagraphStyle('CustomTitle', parent=styles['Heading1'], fontSize=18,
+                                        alignment=TA_CENTER, spaceAfter=20)
+            
+            story = []
+            story.append(Paragraph("Answer Key", title_style))
+            story.append(Spacer(1, 20))
+            
+            data = [['Q.No.', 'Answer']]
+            for mcq in mcqs:
+                q_id = mcq.get('id', '')
+                correct_idx = mcq.get('correct_answer', 0)
+                answer = self._get_correct_letter(correct_idx)
+                data.append([str(q_id), answer])
+            
+            table = Table(data, colWidths=[50*mm, 30*mm])
+            table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 12),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('FONTSIZE', (0, 1), (-1, -1), 10),
+            ]))
+            
+            story.append(table)
+            doc.build(story)
+            return buffer.getvalue()
+        except ImportError:
+            raise ValueError("PDF export requires reportlab. Install with: pip install reportlab")
+    
+    # OMR Integrated PDF - Type 2 (questions first, OMR sheet at end)
+    def export_omr_separate_pdf(self, mcqs: List[Dict[str, Any]]) -> bytes:
+        """Export PDF with questions first, then OMR sheet at the end."""
+        try:
+            from reportlab.lib import colors
+            from reportlab.lib.pagesizes import A4
+            from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+            from reportlab.lib.units import mm
+            from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
+            from reportlab.lib.enums import TA_CENTER
+            from io import BytesIO
+            
+            buffer = BytesIO()
+            doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=15*mm, bottomMargin=15*mm,
+                                   leftMargin=15*mm, rightMargin=15*mm)
+            
+            styles = getSampleStyleSheet()
+            title_style = ParagraphStyle('CustomTitle', parent=styles['Heading1'], fontSize=16,
+                                        alignment=TA_CENTER, spaceAfter=10)
+            
+            story = []
+            story.append(Paragraph("Question Paper", title_style))
+            story.append(Spacer(1, 10))
+            
+            for idx, mcq in enumerate(mcqs, 1):
+                options = self._ensure_four_options(mcq.get('options', []))
+                q_text = f"<b>Q{idx}.</b> {mcq.get('question', '')}"
+                story.append(Paragraph(q_text, styles['Normal']))
+                story.append(Spacer(1, 3))
+                
+                for opt_idx, option in enumerate(options):
+                    opt_text = f"{OPTION_LETTERS[opt_idx]}) {option}"
+                    story.append(Paragraph(f"   {opt_text}", styles['Normal']))
+                
+                story.append(Spacer(1, 8))
+                
+                if idx % 25 == 0:
+                    story.append(PageBreak())
+            
+            story.append(PageBreak())
+            story.append(Paragraph("OMR Answer Sheet", title_style))
+            story.append(Spacer(1, 20))
+            
+            omr_data = [['Q.No.', 'A', 'B', 'C', 'D']]
+            rows = []
+            for i in range(1, min(len(mcqs) + 1, 101)):
+                rows.append([str(i), '( )', '( )', '( )', '( )'])
+            
+            while len(rows) < 25:
+                rows.append(['', '', '', '', ''])
+            
+            omr_data.extend(rows)
+            
+            omr_table = Table(omr_data, colWidths=[30*mm, 25*mm, 25*mm, 25*mm, 25*mm])
+            omr_table.setStyle(TableStyle([
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('FONTSIZE', (0, 0), (-1, -1), 8),
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                ('TOPPADDING', (0, 0), (-1, -1), 8),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+            ]))
+            
+            story.append(omr_table)
+            doc.build(story)
+            return buffer.getvalue()
+        except ImportError:
+            raise ValueError("PDF export requires reportlab. Install with: pip install reportlab")
+    
+    # Tabular PDF (6 columns: Q#, Question, Opt1-4, Answer)
+    def export_tabular_pdf(self, mcqs: List[Dict[str, Any]]) -> bytes:
+        """Export MCQs in tabular format PDF."""
+        try:
+            from reportlab.lib import colors
+            from reportlab.lib.pagesizes import A4, landscape
+            from reportlab.lib.styles import getSampleStyleSheet
+            from reportlab.lib.units import mm
+            from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+            from io import BytesIO
+            
+            buffer = BytesIO()
+            doc = SimpleDocTemplate(buffer, pagesize=landscape(A4), topMargin=10*mm, 
+                                   bottomMargin=10*mm, leftMargin=10*mm, rightMargin=10*mm)
+            
+            data = [['Q.No.', 'Question', 'Option A', 'Option B', 'Option C', 'Option D', 'Answer']]
+            
+            for mcq in mcqs:
+                q_id = str(mcq.get('id', ''))
+                question = mcq.get('question', '')[:80]
+                options = self._ensure_four_options(mcq.get('options', []))
+                correct_idx = mcq.get('correct_answer', 0)
+                answer = self._get_correct_letter(correct_idx)
+                
+                data.append([
+                    q_id,
+                    question,
+                    options[0][:40] if options[0] else '',
+                    options[1][:40] if options[1] else '',
+                    options[2][:40] if options[2] else '',
+                    options[3][:40] if options[3] else '',
+                    answer
+                ])
+            
+            table = Table(data, colWidths=[20*mm, 50*mm, 40*mm, 40*mm, 40*mm, 40*mm, 20*mm])
+            table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.darkblue),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 8),
+                ('FONTSIZE', (0, 1), (-1, -1), 7),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey]),
+            ]))
+            
+            doc.build([table])
+            return buffer.getvalue()
+        except ImportError:
+            raise ValueError("PDF export requires reportlab. Install with: pip install reportlab")
+    
+    # DOCX Question Paper
+    def export_docx(self, mcqs: List[Dict[str, Any]]) -> bytes:
+        """Export question paper as DOCX."""
+        try:
+            from docx import Document
+            from docx.enum.text import WD_ALIGN_PARAGRAPH
+            from io import BytesIO
+            
+            doc = Document()
+            
+            title = doc.add_heading('Question Paper', 0)
+            title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            
+            doc.add_paragraph(f'Total Questions: {len(mcqs)}')
+            doc.add_paragraph()
+            
+            for idx, mcq in enumerate(mcqs, 1):
+                options = self._ensure_four_options(mcq.get('options', []))
+                
+                q_para = doc.add_paragraph()
+                q_run = q_para.add_run(f'Q{idx}. {mcq.get("question", "")}')
+                q_run.bold = True
+                
+                for opt_idx, option in enumerate(options):
+                    opt_para = doc.add_paragraph(f'   {OPTION_LETTERS[opt_idx]}) {option}')
+                
+                doc.add_paragraph()
+            
+            buffer = BytesIO()
+            doc.save(buffer)
+            return buffer.getvalue()
+        except ImportError:
+            raise ValueError("DOCX export requires python-docx. Install with: pip install python-docx")
+    
     # Main export method
     def export(self, file_id: str, format: str) -> Union[str, bytes]:
         mcqs = self.load_master_json(file_id)
@@ -224,8 +482,21 @@ class ExportService:
             return self.export_gift(mcqs)
         elif fmt == 'excel':
             return self.export_excel(mcqs)
+        # New print-ready formats
+        elif fmt == 'question_pdf':
+            return self.export_question_pdf(mcqs)
+        elif fmt == 'answer_key_pdf':
+            return self.export_answer_key_pdf(mcqs)
+        elif fmt == 'omr_pdf':
+            return self.export_omr_separate_pdf(mcqs)
+        elif fmt == 'tabular_pdf':
+            return self.export_tabular_pdf(mcqs)
+        elif fmt == 'docx':
+            return self.export_docx(mcqs)
         else:
             raise ValueError(f"Unsupported format: {format}")
     
     def get_supported_formats(self) -> List[str]:
-        return ['json', 'csv', 'txt', 'markdown', 'html', 'xml', 'yaml', 'sql', 'aiken', 'gift', 'excel']
+        return ['json', 'csv', 'txt', 'markdown', 'html', 'xml', 'yaml', 'sql', 'aiken', 'gift', 'excel',
+                'question_pdf', 'answer_key_pdf', 'omr_pdf', 'tabular_pdf', 'docx']
+

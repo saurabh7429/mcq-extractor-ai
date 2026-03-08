@@ -1,20 +1,30 @@
-# TODO: Universal Format Export System
+# TODO: Print-Ready Export Formats Implementation
 
-## Phase 1: Core Export Architecture ✅ COMPLETED
-- [x] 1. Analyze project structure and understand current implementation
-- [x] 2. Create export_service.py with format converters (JSON, CSV, TXT, Markdown, HTML)
-- [x] 3. Add export routes to download.py
-- [x] 4. Test the export system
+## Task
+Extend the export system with print-ready formats using lightweight libraries (reportlab, python-docx)
 
-## Phase 2: Frontend Integration ✅ COMPLETED
-- [x] 1. Update preview.html with export dropdown button
-- [x] 2. Add format download buttons (JSON, CSV, TXT, Markdown, HTML)
-- [x] 3. Add CSS styles for export dropdown
-- [x] 4. Update preview.js with export functionality
+## New Formats Implemented
+- [x] 1. Question Paper PDF (questions + MCQs only)
+- [x] 2. Answer Key PDF (question IDs + answers)
+- [x] 3. OMR Sheet PDF (questions + OMR sheet at end)
+- [x] 4. Tabular PDF (7 columns: Q#, Question, Opt1-4, Answer)
+- [x] 5. DOCX Question Paper
 
-## Phase 3: Extended Formats (Future)
-- [ ] 1. Anki format
-- [ ] 2. Excel format
-- [ ] 3. Quizlet format
-- [ ] 4. Moodle XML format
+## Implementation Steps Completed
+- [x] 1. Update requirements.txt - Added reportlab, python-docx
+- [x] 2. Update backend/services/export_service.py - Added 5 new export methods
+- [x] 3. Update backend/routes/download.py - Added route handlers and MIME types
+- [x] 4. Update frontend/js/preview.js - Added format definitions and dropdown handling
+- [x] 5. Update frontend/preview.html - Added Print Formats dropdown button
+
+## Installation Required
+Run the following to install new dependencies:
+```
+pip install reportlab python-docx
+```
+
+## Memory Considerations
+- Uses streaming/incremental PDF generation with reportlab
+- Process MCQs in batches
+- Compatible with Render free tier (512MB RAM)
 
