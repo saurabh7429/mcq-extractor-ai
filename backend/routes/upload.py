@@ -245,12 +245,9 @@ def upload_file():
                 extraction_success = False
                 extraction_error = str(extract_error)
             
-            # Cleanup: Delete temporary PDF file after processing
-            try:
-                storage.delete_file(file_path)
-                logger.info(f"Temporary PDF file deleted: {file_path}")
-            except Exception as cleanup_error:
-                logger.warning(f"Failed to cleanup temporary file: {cleanup_error}")
+            # Note: We do NOT delete the PDF file here because the preview page
+            # needs to read it again from storage when calling /extract/<file_id>
+            # The cleanup_old_files() function will handle old files (older than 1 hour)
 
             # Run cleanup of old files periodically
             cleanup_old_files()

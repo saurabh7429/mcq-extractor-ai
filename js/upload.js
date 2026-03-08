@@ -111,9 +111,9 @@ function processFile(file) {
         return;
     }
 
-    // Validate file size (10MB = 10 * 1024 * 1024 bytes)
+    // Validate file size (20MB = 20 * 1024 * 1024 bytes)
     if (!validateFileSize(file)) {
-        showError('File too large. Maximum size is 10MB.', 'Please compress your PDF or use a smaller file.');
+        showError('File too large. Maximum size is 20MB.', 'Please compress your PDF or use a smaller file.');
         return;
     }
 
@@ -137,7 +137,7 @@ function validateFileType(file) {
 }
 
 function validateFileSize(file) {
-    const maxSize = 10 * 1024 * 1024; // 10MB
+    const maxSize = 20 * 1024 * 1024; // 20MB
     return file.size <= maxSize;
 }
 

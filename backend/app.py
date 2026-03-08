@@ -105,7 +105,7 @@ def create_app(config_name: str = None):
             'version': '1.0.0'
         }), 200
     
-    # Serve frontend - root route
+# Serve frontend - root route
     @app.route('/', methods=['GET'])
     def serve_index():
         """Serve the main index.html page."""
@@ -116,6 +116,7 @@ def create_app(config_name: str = None):
     
     # Serve preview page
     @app.route('/preview', methods=['GET'])
+    @app.route('/preview.html', methods=['GET'])
     def serve_preview():
         """Serve the preview.html page."""
         from flask import send_from_directory
