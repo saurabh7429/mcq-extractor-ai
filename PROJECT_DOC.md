@@ -557,6 +557,46 @@ python run.py
 
 ---
 
+## Export Formats
+
+The MCQ Extractor AI supports multiple export formats for your extracted questions:
+
+### Digital Formats (Export As button):
+| Format | Description | File Type |
+|--------|-------------|-----------|
+| JSON | Raw MCQ data | .json |
+| CSV | Spreadsheet format | .csv |
+| TXT | Plain text | .txt |
+| Markdown | Formatted text | .md |
+| HTML | Web page | .html |
+| XML | Structured data | .xml |
+| YAML | Configuration format | .yaml |
+| SQL | Database insert statements | .sql |
+| Aiken | Moodle format | .txt |
+| GIFT | Moodle import format | .txt |
+| Excel | Spreadsheet | .xlsx |
+
+### Print-Ready Formats (Print Formats button):
+| Format | Description | File Type |
+|--------|-------------|-----------|
+| Question Paper PDF | All questions with options (no answers) | .pdf |
+| Answer Key PDF | Question IDs with correct answers | .pdf |
+| OMR Sheet PDF | Questions + OMR bubble sheet at end | .pdf |
+| Tabular PDF | Table format with all data | .pdf |
+| DOCX Question Paper | Word document | .docx |
+
+### Export API Endpoint:
+```
+GET /api/download/export/<format>/<file_id>
+```
+
+Example:
+```
+/api/download/export/question_pdf/744a8cec-e5f2-4921-9516-99a7bd08d08b
+```
+
+---
+
 ## Credits
 
 - **AI:** GROQ (Llama 3.1 8B Model)

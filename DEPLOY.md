@@ -93,6 +93,21 @@ GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxxxxx
 - `render.yaml` - Render configuration (auto-deploy)
 - `.env.example` - Template for environment variables
 
+## New Dependencies Added (v2.4.0)
+The following packages were added for print-ready exports:
+- `reportlab` - PDF generation (~2MB)
+- `python-docx` - DOCX generation (~5MB)
+
+### Updated Build Command:
+```
+pip install -r requirements.txt
+```
+
+### Updated Start Command:
+```
+gunicorn backend.app:app --workers 4 --bind 0.0.0.0:$PORT
+```
+
 ## Files NOT to commit:
 - `.env` - Contains API keys (add to .gitignore)
 - `__pycache__/` - Python cache
