@@ -2,7 +2,10 @@
  * upload.js - Handle file upload functionality
  */
 
-const API_BASE_URL = '/api';
+// Dynamic API_BASE_URL - uses current host in production, localhost in development
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+    ? '/api' 
+    : '/api';
 
 // DOM Elements
 const dropZone = document.getElementById('dropZone');
