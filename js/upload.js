@@ -2,10 +2,23 @@
  * upload.js - Handle file upload functionality
  */
 
-// Dynamic API_BASE_URL - uses current host in production, localhost in development
-const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-    ? '/api' 
-    : '/api';
+// Dynamic API_BASE_URL based on deployment
+// Local development: http://localhost:5000/api
+// GitHub Pages: https://mcq-extractor-ai.onrender.com/api
+// Render: https://mcq-extractor-ai.onrender.com/api
+const API_BASE_URL = (function() {
+    const hostname = window.location.hostname;
+    // Localhost or 127.0.0.1
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return '/api';
+    }
+    // GitHub Pages - use Render API
+    if (hostname.includes('github.io')) {
+        return 'https://mcq-extractor-ai.onrender.com/api';
+    }
+    // Render - same origin
+    return '/api';
+})();
 
 // DOM Elements
 const dropZone = document.getElementById('dropZone');
