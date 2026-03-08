@@ -205,9 +205,19 @@ async function uploadFile() {
 
         let uploadData = null;
         let uploadText = await uploadResponse.text();
+        
+        // Debug: Log the response
+        console.log('Upload response status:', uploadResponse.status);
+        console.log('Upload response text:', uploadText.substring(0, 500));
+        
         try {
             uploadData = uploadText ? JSON.parse(uploadText) : null;
         } catch (e) {
+            console.error('Failed to parse upload response:', e);
+            // If response is HTML (error page), show more helpful message
+            if (uploadText.includes('<!DOCTYPE') || uploadText.includes('<html')) {
+                throw new Error('API server error. Please check if the server is running properly.');
+            }
             uploadData = null;
         }
 

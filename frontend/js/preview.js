@@ -2,7 +2,17 @@
  * preview.js - Handle MCQ preview functionality
  */
 
-const API_BASE_URL = '/api';
+// Dynamic API_BASE_URL based on deployment
+const API_BASE_URL = (function() {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return '/api';
+    }
+    if (hostname.includes('github.io')) {
+        return 'https://mcq-extractor-ai.onrender.com/api';
+    }
+    return '/api';
+})();
 
 // DOM Elements
 const mcqGrid = document.getElementById('mcqGrid');
