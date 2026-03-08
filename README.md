@@ -65,14 +65,14 @@ Ever had a PDF with 100+ MCQs and wished you had them in a digital format?
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                      FRONTEND                               │
-│   HTML5  •  CSS3  •  JavaScript (Vanilla)                 │
-│   Bootstrap  •  Responsive Design                         │
+│   HTML5  •  CSS3  •  JavaScript (Vanilla)                   │
+│   Bootstrap  •  Responsive Design                           │
 └─────────────────────────────────────────────────────────────┘
                           │
                           ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                      BACKEND                                 │
-│   Python  •  Flask  •  GROQ API (Llama 3.1 8B)          │
+│                      BACKEND                                │
+│   Python  •  Flask  •  GROQ API (Llama 3.1 8B)              │
 └─────────────────────────────────────────────────────────────┘
                           │
           ┌───────────────┼───────────────┐
