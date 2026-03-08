@@ -13,7 +13,8 @@ class FileValidator:
     
     ALLOWED_EXTENSIONS = {'pdf'}
     ALLOWED_MIME_TYPES = {'application/pdf'}
-    MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
+    MAX_FILE_SIZE = 20 * 1024 * 1024  # 20MB
+    MAX_PAGES = 50  # Maximum allowed pages in PDF
     
     def __init__(self):
         """Initialize file validator."""
@@ -142,6 +143,53 @@ class FileValidator:
         }
         
         return result
+    
+    def validate_page_count(self, file_path: str) -> Dict[str, Any]:
+        """
+        Validate PDF page count.
+        
+        Args:
+            file_path: Path to the PDF file
+        
+        Returns:
+            Dictionary with validation result
+        """
+        result = {
+            'valid': False,
+            'message': '',
+            'details': {}
+        }
+        
+        if not file_path:
+            result['message'] = 'No file path provided'
+            return result
+        
+        try:
+            import pdfplumber
+            
+            with pdfplumber.open(file_path) as pdf:
+                page_count = len(pdf.pages)
+                
+                if page_count > self.MAX_PAGES:
+                    result['message'] = f'PDF exceeds maximum page limit ({self.MAX_PAGES} pages). This PDF has {page_count} pages.'
+                    result['details'] = {
+                        'page_count': page_count,
+                        'max_pages': self.MAX_PAGES
+                    }
+                    return result
+                
+                result['valid'] = True
+                result['message'] = 'Valid page count'
+                result['details'] = {
+                    'page_count': page_count,
+                    'max_pages': self.MAX_PAGES
+                }
+                return result
+                
+        except Exception as e:
+            logger.error(f"Error reading PDF page count: {e}")
+            result['message'] = 'Failed to read PDF. The file may be corrupted or password protected.'
+            return result
     
     def validate_pdf(self, file) -> Dict[str, Any]:
         """

@@ -42,8 +42,9 @@ class Config:
     LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     
     # File upload settings
-    MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10MB max file size
+    MAX_CONTENT_LENGTH = 20 * 1024 * 1024  # 20MB max file size
     ALLOWED_EXTENSIONS = {'pdf'}
+    MAX_PDF_PAGES = 50  # Maximum allowed pages in PDF
     UPLOAD_FOLDER = BASE_DIR / 'storage' / 'uploaded_pdfs'
     JSON_OUTPUT_FOLDER = BASE_DIR / 'storage' / 'generated_json'
     
