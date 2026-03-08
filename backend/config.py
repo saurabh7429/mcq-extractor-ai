@@ -11,6 +11,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env')
 
 
+def get_database_path():
+    """
+    Get the database path based on the environment.
+    On Render.com, use /tmp for writable storage.
+    """
+    # Check if running on Render.com
+    if os.getenv('RENDER') or os.path.exists('/opt/render'):
+        # Use /tmp on Render.com for writable storage
+        return Path('/tmp') / 'mcq.db'
+    else:
+        # Use local database path
+        return BASE_DIR / 'database' / 'mcq.db'
+
+
 class Config:
     """Base configuration class."""
     
