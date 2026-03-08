@@ -9,197 +9,96 @@ from backend.config import Config
 from backend.services.storage_service import StorageService
 from backend.services.export_service import ExportService
 
-# Create logger
 logger = logging.getLogger(__name__)
-
-# Create blueprint
 bp = Blueprint('download', __name__)
-
 
 @bp.route('/<file_id>', methods=['GET'])
 def download_json_by_id(file_id: str):
-    """
-    Download a generated JSON file by file_id (UUID).
-    
-    Args:
-        file_id: The UUID of the file to download
-    
-    Returns:
-        JSON file as attachment
-    """
     logger.info(f"Download request for file_id: {file_id}")
-    
     try:
         storage = StorageService()
         file_path = storage.get_json_by_uuid(file_id)
-        
         if not file_path:
-            logger.warning(f"File not found for file_id: {file_id}")
-            return jsonify({
-                'success': False,
-                'message': 'File not found',
-                'file_id': file_id
-            }), 404
-        
-        # Use original filename for download
+            return jsonify({'success': False, 'message': 'File not found', 'file_id': file_id}), 404
         filename = file_path.name
-        
-        return send_file(
-            file_path,
-            mimetype='application/json',
-            as_attachment=True,
-            download_name=filename
-        )
-        
+        return send_file(file_path, mimetype='application/json', as_attachment=True, download_name=filename)
     except Exception as e:
         logger.exception(f"Error during download: {str(e)}")
-        return jsonify({
-            'success': False,
-            'message': f'Failed to download file: {str(e)}',
-            'file_id': file_id
-        }), 500
-
+        return jsonify({'success': False, 'message': f'Failed to download file: {str(e)}', 'file_id': file_id}), 500
 
 @bp.route('/json/<filename>', methods=['GET'])
 def download_json(filename: str):
-    """
-    Download a generated JSON file.
-    
-    Args:
-        filename: Name of the JSON file to download
-    
-    Returns:
-        JSON file as attachment
-    """
     logger.info(f"Download request for JSON: {filename}")
-    
     try:
         storage = StorageService()
         file_path = storage.get_json_path(filename)
-        
         if not file_path.exists():
-            logger.warning(f"File not found: {filename}")
             raise NotFoundError(f"File not found: {filename}")
-        
-        return send_file(
-            file_path,
-            mimetype='application/json',
-            as_attachment=True,
-            download_name=filename
-        )
-        
+        return send_file(file_path, mimetype='application/json', as_attachment=True, download_name=filename)
     except NotFoundError:
         raise
     except Exception as e:
         logger.exception(f"Error during download: {str(e)}")
         raise ValidationError(f"Failed to download file: {str(e)}")
-
 
 @bp.route('/pdf/<filename>', methods=['GET'])
 def download_pdf(filename: str):
-    """
-    Download an uploaded PDF file.
-    
-    Args:
-        filename: Name of the PDF file to download
-    
-    Returns:
-        PDF file as attachment
-    """
     logger.info(f"Download request for PDF: {filename}")
-    
     try:
         storage = StorageService()
         file_path = storage.get_pdf_path(filename)
-        
         if not file_path.exists():
-            logger.warning(f"File not found: {filename}")
             raise NotFoundError(f"File not found: {filename}")
-        
-        return send_file(
-            file_path,
-            mimetype='application/pdf',
-            as_attachment=True,
-            download_name=filename
-        )
-        
+        return send_file(file_path, mimetype='application/pdf', as_attachment=True, download_name=filename)
     except NotFoundError:
         raise
     except Exception as e:
         logger.exception(f"Error during download: {str(e)}")
         raise ValidationError(f"Failed to download file: {str(e)}")
 
-
 @bp.route('/list', methods=['GET'])
 def list_files():
-    """
-    List all available files for download.
-    
-    Returns:
-        JSON response with list of files
-    """
     logger.info("Listing available files")
-    
     try:
         storage = StorageService()
         json_files = storage.list_json_files()
         pdf_files = storage.list_pdf_files()
-        
-        return jsonify({
-            'success': True,
-            'data': {
-                'json_files': json_files,
-                'pdf_files': pdf_files
-            }
-        }), 200
-        
+        return jsonify({'success': True, 'data': {'json_files': json_files, 'pdf_files': pdf_files}}), 200
     except Exception as e:
         logger.exception(f"Error listing files: {str(e)}")
         raise ValidationError(f"Failed to list files: {str(e)}")
 
-
-# ==================== Export Routes ====================
-
 @bp.route('/export/<format>/<file_id>', methods=['GET'])
 def export_format(format: str, file_id: str):
-    """
-    Export MCQs to specified format.
-    
-    Args:
-        format: Export format (json, csv, txt, markdown, html)
-        file_id: The UUID of the file
-        
-    Returns:
-        File in the requested format
-    """
+    """Export MCQs to specified format."""
     logger.info(f"Export request: format={format}, file_id={file_id}")
-    
     try:
         export_service = ExportService()
         content = export_service.export(file_id, format)
         
-        # Determine mimetype and extension
         format_info = {
             'json': ('application/json', 'json'),
             'csv': ('text/csv', 'csv'),
             'txt': ('text/plain', 'txt'),
             'markdown': ('text/markdown', 'md'),
-            'html': ('text/html', 'html')
+            'html': ('text/html', 'html'),
+            'xml': ('application/xml', 'xml'),
+            'yaml': ('text/yaml', 'yaml'),
+            'sql': ('application/sql', 'sql'),
+            'aiken': ('text/plain', 'txt'),
+            'gift': ('text/plain', 'txt'),
+            'excel': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx')
         }
         
         mimetype, ext = format_info.get(format.lower(), ('application/json', 'json'))
         filename = f"{file_id}.{ext}"
         
-        # Create in-memory file
-        file_stream = io.BytesIO(content.encode('utf-8'))
+        if isinstance(content, bytes):
+            file_stream = io.BytesIO(content)
+        else:
+            file_stream = io.BytesIO(content.encode('utf-8'))
         
-        return send_file(
-            file_stream,
-            mimetype=mimetype,
-            as_attachment=True,
-            download_name=filename
-        )
-        
+        return send_file(file_stream, mimetype=mimetype, as_attachment=True, download_name=filename)
     except ValueError as e:
         logger.warning(f"Export validation error: {str(e)}")
         raise ValidationError(str(e))
@@ -207,24 +106,13 @@ def export_format(format: str, file_id: str):
         logger.exception(f"Error during export: {str(e)}")
         raise ValidationError(f"Failed to export: {str(e)}")
 
-
 @bp.route('/export/formats', methods=['GET'])
 def get_export_formats():
-    """
-    Get list of supported export formats.
-    
-    Returns:
-        JSON response with supported formats
-    """
+    """Get list of supported export formats."""
     try:
         export_service = ExportService()
         formats = export_service.get_supported_formats()
-        
-        return jsonify({
-            'success': True,
-            'formats': formats
-        }), 200
-        
+        return jsonify({'success': True, 'formats': formats}), 200
     except Exception as e:
         logger.exception(f"Error getting formats: {str(e)}")
         raise ValidationError(f"Failed to get formats: {str(e)}")

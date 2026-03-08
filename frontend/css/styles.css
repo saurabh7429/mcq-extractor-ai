@@ -1262,3 +1262,36 @@ input:focus-visible {
     background: var(--border);
 }
 
+/* ==================== Export Section ==================== */
+.export-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+    justify-content: center;
+}
+
+.export-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #4F46E5;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all var(--transition-base);
+}
+
+.export-btn:hover {
+    background: #4338ca;
+    transform: translateY(-2px);
+}
+
+.export-icon {
+    font-size: 1rem;
+}
+
