@@ -47,8 +47,8 @@ class Config:
     UPLOAD_FOLDER = BASE_DIR / 'storage' / 'uploaded_pdfs'
     JSON_OUTPUT_FOLDER = BASE_DIR / 'storage' / 'generated_json'
     
-    # Database settings
-    DATABASE_PATH = BASE_DIR / 'database' / 'mcq.db'
+    # Database settings - Use environment-specific path
+    DATABASE_PATH = get_database_path()
     SQLALCHEMY_DATABASE_URI = f'sqlite:///{DATABASE_PATH}'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
