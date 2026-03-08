@@ -6,6 +6,7 @@
 ![Flask](https://img.shields.io/badge/Flask-3.0+-green?style=for-the-badge)
 ![AI](https://img.shields.io/badge/AI-GROQ-purple?style=for-the-badge)
 ![Live](https://img.shields.io/badge/Live-Render-brightgreen?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-2.4.0-blue?style=for-the-badge)
 
 ---
 
@@ -17,7 +18,7 @@ Ever had a PDF with 100+ MCQs and wished you had them in a digital format?
 - Upload a PDF 📄
 - AI reads and extracts all questions 🎯
 - Get JSON with questions, options & correct answers 📝
-- Download or preview instantly 🚀
+- Download in multiple formats or print directly 🚀
 
 ---
 
@@ -37,24 +38,42 @@ Ever had a PDF with 100+ MCQs and wished you had them in a digital format?
 | 📄 **PDF Support** | Extract from text-based PDFs |
 | 🎯 **Accurate** | Gets questions, 4 options & correct answers |
 | 🌐 **Web Based** | No installation needed - runs in browser |
-| 💾 **JSON Export** | Download MCQs in standard JSON format |
+| 💾 **Multiple Formats** | Export to JSON, CSV, Excel, DOCX & more |
+| 🖨️ **Print-Ready** | Direct PDF export for printing |
+| 📝 **DOCX Export** | Word document for question papers |
 | 🔒 **Secure** | Your files stay on server, deleted after processing |
+
+### Export Formats Available:
+
+**Digital Formats (Export As):**
+- JSON, CSV, TXT, Markdown, HTML, XML, YAML
+- SQL (database insert statements)
+- Aiken & GIFT (Moodle import formats)
+- Excel (XLSX)
+
+**Print-Ready Formats (Print Formats):**
+- Question Paper PDF
+- Answer Key PDF
+- OMR Sheet PDF (for bubble answer sheets)
+- Tabular PDF (table format)
+- DOCX Question Paper (Word document)
 
 ---
 
 ## 🛠️ Tech Stack
 
 ```
-┌─────────────────────────────────────────────────────┐
-│                    FRONTEND                         │
-│   HTML5  •  CSS3  •  JavaScript (Vanilla)         │
-└─────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                      FRONTEND                               │
+│   HTML5  •  CSS3  •  JavaScript (Vanilla)                 │
+│   Bootstrap  •  Responsive Design                         │
+└─────────────────────────────────────────────────────────────┘
                           │
                           ▼
-┌─────────────────────────────────────────────────────┐
-│                    BACKEND                          │
-│   Python  •  Flask  •  GROQ API (Llama 3.1)       │
-└─────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                      BACKEND                                 │
+│   Python  •  Flask  •  GROQ API (Llama 3.1 8B)          │
+└─────────────────────────────────────────────────────────────┘
                           │
           ┌───────────────┼───────────────┐
           ▼               ▼               ▼
@@ -62,6 +81,13 @@ Ever had a PDF with 100+ MCQs and wished you had them in a digital format?
      │  pypdf  │    │  SQLite  │    │ gunicorn │
      │ (Reader)│    │    DB    │    │  Server  │
      └─────────┘    └──────────┘    └──────────┘
+                          │
+          ┌───────────────┼───────────────┐
+          ▼               ▼               ▼
+    ┌───────────┐   ┌───────────┐   ┌───────────┐
+    │ reportlab │   │python-docx│   │ openpyxl  │
+    │ (PDF Gen) │   │(DOCX Gen) │   │(Excel Gen)│
+    └───────────┘   └───────────┘   └───────────┘
 ```
 
 ---
@@ -70,17 +96,42 @@ Ever had a PDF with 100+ MCQs and wished you had them in a digital format?
 
 ```
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   Upload    │────►│    AI       │────►│  Download   │
-│     PDF     │     │  Processes  │     │     JSON    │
+│   Upload    │────►│     AI      │────►│   Preview   │
+│     PDF     │     │  Processes  │     │  & Download │
 └─────────────┘     └─────────────┘     └─────────────┘
      1 click          5-30 sec            Done!
 ```
 
-### Step-by-Step:
-1. **Drop your PDF** - Drag & drop or click to upload
-2. **AI Magic** - Llama 3.1 reads and extracts questions
-3. **Preview** - See all MCQs on screen
-4. **Download** - Get JSON file instantly
+### Step-by-Step Detailed Workflow:
+
+**Step 1: Upload PDF**
+- User drags/drops or clicks to upload PDF
+- Browser sends file to `/api/upload/file`
+- Backend validates file (type, size)
+- Generates unique UUID for the file
+- Saves PDF to `storage/uploaded_pdfs/`
+
+**Step 2: AI Processing**
+- Backend reads PDF text using pypdf
+- Sends text to GROQ API (Llama 3.1 8B model)
+- AI extracts MCQs with proper structure
+- Returns raw MCQ data in JSON format
+
+**Step 3: Data Formatting**
+- JSON Formatter validates and cleans data
+- Ensures each question has exactly 4 options
+- Sets correct_answer as index (0-3)
+- Removes duplicates and invalid entries
+
+**Step 4: Storage & Response**
+- Saves formatted JSON to `storage/generated_json/`
+- Returns MCQs to frontend
+- Frontend displays preview cards
+
+**Step 5: Export Options**
+- Multiple digital formats (JSON, CSV, etc.)
+- Print-ready formats (PDF, DOCX)
+- One-click download
 
 ---
 
@@ -119,31 +170,48 @@ http://localhost:5000
 ```
 mcq-extractor-ai/
 │
-├── 🖥️  frontend/          # Web UI (HTML/CSS/JS)
-│   ├── index.html         # Upload page
-│   ├── preview.html      # Results page
-│   ├── css/styles.css    # Beautiful styling
-│   └── js/               # Client-side scripts
+├── 🖥️  frontend/              # Web UI (HTML/CSS/JS)
+│   ├── index.html             # Upload page
+│   ├── preview.html           # Results page with export options
+│   ├── css/styles.css         # Beautiful styling
+│   └── js/                   # Client-side scripts
+│       ├── upload.js         # File upload handling
+│       ├── preview.js         # MCQ display & export
+│       ├── status.js         # Status messages
+│       └── download.js       # Download functionality
 │
-├── ⚙️   backend/          # Server (Python/Flask)
-│   ├── app.py            # Main Flask app
-│   ├── routes/           # API endpoints
-│   │   ├── upload.py     # Handle file upload
-│   │   ├── extract.py    # MCQ extraction
-│   │   └── download.py   # JSON download
-│   ├── services/          # Core logic
-│   │   ├── ai_processor.py    # GROQ AI integration
-│   │   ├── pdf_reader.py      # PDF text extraction
-│   │   └── json_formatter.py  # Format output
-│   └── models/           # Database
+├── ⚙️   backend/              # Server (Python/Flask)
+│   ├── app.py                # Main Flask application
+│   ├── config.py             # Configuration settings
+│   ├── routes/               # API endpoints
+│   │   ├── upload.py         # POST /api/upload/file
+│   │   ├── extract.py        # POST /api/extract/<file_id>
+│   │   ├── download.py       # GET /api/download/*
+│   │   └── validate.py       # POST /api/validate
+│   ├── services/             # Core business logic
+│   │   ├── ai_processor.py      # GROQ AI integration
+│   │   ├── pdf_reader.py         # PDF text extraction
+│   │   ├── json_formatter.py    # Format & validate MCQs
+│   │   ├── export_service.py    # Export to all formats ⭐NEW
+│   │   └── storage_service.py   # File I/O operations
+│   ├── models/               # Database models
+│   │   ├── database.py
+│   │   ├── mcq_model.py
+│   │   └── pdf_model.py
+│   └── utils/               # Helper utilities
+│       ├── error_handler.py
+│       ├── file_validator.py
+│       └── helpers.py
 │
-├── 💾  storage/           # File storage
-│   ├── uploaded_pdfs/     # Uploaded PDFs
-│   └── generated_json/   # Output JSON files
+├── 💾  storage/              # File storage
+│   ├── uploaded_pdfs/        # Uploaded PDFs
+│   └── generated_json/        # Output JSON files
 │
-├── 📊  database/          # SQLite database
-├── 📝  requirements.txt   # Python packages
-└── 🚀  render.yaml       # Deploy config
+├── 📊  database/             # SQLite database
+├── 📝  requirements.txt       # Python packages
+├── 🚀  run.py               # Application entry point
+├── 🔧  render.yaml          # Render deployment config
+└── 📚  PROJECT_DOC.md       # Detailed documentation
 ```
 
 ---
@@ -152,10 +220,22 @@ mcq-extractor-ai/
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/upload/file` | POST | Upload PDF |
-| `/api/extract/<file_id>` | POST | Extract MCQs |
-| `/api/download/<filename>` | GET | Download JSON |
+| `/api/upload/file` | POST | Upload PDF file |
+| `/api/extract/<file_id>` | POST | Extract MCQs from PDF |
+| `/api/download/<file_id>` | GET | Download original JSON |
+| `/api/download/export/<format>/<file_id>` | GET | Export in specified format ⭐NEW |
+| `/api/download/list` | GET | List all files |
+| `/api/download/export/formats` | GET | Get supported formats |
 | `/api/health` | GET | Server health check |
+
+### New Export Formats:
+```
+/api/download/export/question_pdf/<file_id>     # Question Paper PDF
+/api/download/export/answer_key_pdf/<file_id>   # Answer Key PDF
+/api/download/export/omr_pdf/<file_id>          # OMR Sheet PDF
+/api/download/export/tabular_pdf/<file_id>      # Tabular PDF
+/api/download/export/docx/<file_id>              # DOCX Question Paper
+```
 
 ---
 
@@ -166,7 +246,7 @@ mcq-extractor-ai/
 1. **Push to GitHub**
 ```bash
 git add .
-git commit -m "Ready to deploy"
+git commit -m "v2.4.0 - Added print-ready export formats"
 git push origin main
 ```
 
@@ -184,6 +264,27 @@ git push origin main
 
 ---
 
+## 📊 What's New in v2.4.0
+
+### Added Print-Ready Export Formats:
+- ✅ Question Paper PDF (print without answers)
+- ✅ Answer Key PDF (teachers copy)
+- ✅ OMR Sheet PDF (bubble answer sheets)
+- ✅ Tabular PDF (table format)
+- ✅ DOCX Question Paper (Word document)
+
+### Added Button Functionality:
+- ✅ Copy JSON button
+- ✅ Download JSON button
+- ✅ Print Formats dropdown (separate from Export As)
+- ✅ Fixed button click handlers
+
+### Updated Documentation:
+- ✅ PROJECT_DOC.md - Full details with export formats
+- ✅ DEPLOY.md - New dependencies info
+
+---
+
 ## ❓ FAQ
 
 **Q: Is it free?**
@@ -197,6 +298,12 @@ git push origin main
 
 **Q: Can I use on mobile?**
 > Absolutely! The UI is fully responsive.
+
+**Q: What new export formats are available?**
+> You can now export to Question Paper PDF, Answer Key PDF, OMR Sheet PDF, Tabular PDF, and DOCX!
+
+**Q: How much memory does it use?**
+> Optimized for Render free tier (512MB). Uses lightweight libraries (~7MB total).
 
 ---
 
@@ -238,5 +345,4 @@ Made with ❤️ using Flask + GROQ AI
 *Turn boring PDFs into awesome digital quizzes!* 🎉
 
 </div>
-
 
