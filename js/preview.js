@@ -113,13 +113,15 @@ function setupButtonHandlers() {
         });
     }
     
-    // Back button (Upload More) - FIXED: Use BASE_PATH for GitHub Pages subdirectory
+    // Back button (Upload More) - FIXED: Direct redirect to index.html
     const backBtn = document.getElementById('backBtn');
     if (backBtn) {
         backBtn.addEventListener('click', function() {
             sessionStorage.removeItem('currentFileId');
             sessionStorage.removeItem('currentFileName');
-            window.location.href = BASE_PATH + 'index.html';
+            // Get the base path (host + port) and redirect to index.html
+            const baseUrl = window.location.protocol + '//' + window.location.host;
+            window.location.href = baseUrl + '/index.html';
         });
     }
 }
