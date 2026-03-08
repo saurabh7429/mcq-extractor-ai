@@ -23,6 +23,8 @@ const errorText = document.getElementById('errorText');
 const copyJsonBtn = document.getElementById('copyJsonBtn');
 const downloadJsonBtn = document.getElementById('downloadJsonBtn');
 const backBtn = document.getElementById('backBtn');
+const exportFormatBtn = document.getElementById('exportFormatBtn');
+const exportMenu = document.getElementById('exportMenu');
 
 // State
 let currentMcqs = [];
@@ -73,6 +75,80 @@ function setupButtonListeners() {
         backBtn.addEventListener('click', () => {
             window.location.href = 'index.html';
         });
+    }
+    
+    // Export format button and menu
+    if (exportFormatBtn && exportMenu) {
+        exportFormatBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            exportMenu.classList.toggle('show');
+        });
+        
+        // Handle export option clicks
+        const exportOptions = exportMenu.querySelectorAll('.export-option');
+        exportOptions.forEach(option => {
+            option.addEventListener('click', async (e) => {
+                const format = e.currentTarget.dataset.format;
+                await exportToFormat(format);
+                exportMenu.classList.remove('show');
+            });
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!exportFormatBtn.contains(e.target) && !exportMenu.contains(e.target)) {
+                exportMenu.classList.remove('show');
+            }
+        });
+    }
+}
+
+// ==================== Export Functions ====================
+
+async function exportToFormat(format) {
+    if (!currentFileId) {
+        showToast('No file ID found', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/download/export/${format}/${currentFileId}`);
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to export');
+        }
+        
+        // Get the blob from response
+        const blob = await response.blob();
+        
+        // Get filename from content-disposition header or create default
+        const contentDisposition = response.headers.get('content-disposition');
+        let filename = `${currentFileId}.${format}`;
+        if (contentDisposition) {
+            const match = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+            if (match) {
+                filename = match[1].replace(/['"]/g, '');
+            }
+        }
+        
+        // Create download link
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        
+        const formatUpper = format.toUpperCase();
+        showToast(`${formatUpper} file downloaded successfully!`, 'success');
+        
+    } catch (error) {
+        console.error('Export error:', error);
+        showToast(`Failed to export: ${error.message}`, 'error');
     }
 }
 

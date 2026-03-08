@@ -1,11 +1,13 @@
 """
-Download API route - handles file downloads.
+Download API route - handles file downloads and exports.
 """
 import logging
+import io
 from flask import Blueprint, jsonify, request, send_file
 from backend.utils.error_handler import ValidationError, NotFoundError
 from backend.config import Config
 from backend.services.storage_service import StorageService
+from backend.services.export_service import ExportService
 
 # Create logger
 logger = logging.getLogger(__name__)
@@ -154,3 +156,75 @@ def list_files():
     except Exception as e:
         logger.exception(f"Error listing files: {str(e)}")
         raise ValidationError(f"Failed to list files: {str(e)}")
+
+
+# ==================== Export Routes ====================
+
+@bp.route('/export/<format>/<file_id>', methods=['GET'])
+def export_format(format: str, file_id: str):
+    """
+    Export MCQs to specified format.
+    
+    Args:
+        format: Export format (json, csv, txt, markdown, html)
+        file_id: The UUID of the file
+        
+    Returns:
+        File in the requested format
+    """
+    logger.info(f"Export request: format={format}, file_id={file_id}")
+    
+    try:
+        export_service = ExportService()
+        content = export_service.export(file_id, format)
+        
+        # Determine mimetype and extension
+        format_info = {
+            'json': ('application/json', 'json'),
+            'csv': ('text/csv', 'csv'),
+            'txt': ('text/plain', 'txt'),
+            'markdown': ('text/markdown', 'md'),
+            'html': ('text/html', 'html')
+        }
+        
+        mimetype, ext = format_info.get(format.lower(), ('application/json', 'json'))
+        filename = f"{file_id}.{ext}"
+        
+        # Create in-memory file
+        file_stream = io.BytesIO(content.encode('utf-8'))
+        
+        return send_file(
+            file_stream,
+            mimetype=mimetype,
+            as_attachment=True,
+            download_name=filename
+        )
+        
+    except ValueError as e:
+        logger.warning(f"Export validation error: {str(e)}")
+        raise ValidationError(str(e))
+    except Exception as e:
+        logger.exception(f"Error during export: {str(e)}")
+        raise ValidationError(f"Failed to export: {str(e)}")
+
+
+@bp.route('/export/formats', methods=['GET'])
+def get_export_formats():
+    """
+    Get list of supported export formats.
+    
+    Returns:
+        JSON response with supported formats
+    """
+    try:
+        export_service = ExportService()
+        formats = export_service.get_supported_formats()
+        
+        return jsonify({
+            'success': True,
+            'formats': formats
+        }), 200
+        
+    except Exception as e:
+        logger.exception(f"Error getting formats: {str(e)}")
+        raise ValidationError(f"Failed to get formats: {str(e)}")
