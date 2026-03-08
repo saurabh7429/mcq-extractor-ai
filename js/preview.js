@@ -13,6 +13,19 @@ const API_BASE_URL = (function() {
     return '/api';
 })();
 
+// Get base path for redirects (works with sub-directory hosting like GitHub Pages)
+const BASE_PATH = (function() {
+    const path = window.location.pathname;
+    // Remove trailing slash and get the base path
+    // For /mcq-extractor-ai/index.html, basePath would be /mcq-extractor-ai/
+    // For /index.html, basePath would be /
+    const lastSlash = path.lastIndexOf('/');
+    if (lastSlash === 0) {
+        return '/';
+    }
+    return path.substring(0, lastSlash + 1);
+})();
+
 const EXPORT_FORMATS = [
     { id: 'json', name: 'JSON', ext: 'json', icon: '&#128459;' },
     { id: 'csv', name: 'CSV', ext: 'csv', icon: '&#128202;' },
@@ -99,13 +112,13 @@ function setupButtonHandlers() {
         });
     }
     
-    // Back button (Upload More)
+    // Back button (Upload More) - FIXED: Use BASE_PATH for GitHub Pages subdirectory
     const backBtn = document.getElementById('backBtn');
     if (backBtn) {
         backBtn.addEventListener('click', function() {
             sessionStorage.removeItem('currentFileId');
             sessionStorage.removeItem('currentFileName');
-            window.location.href = '/';
+            window.location.href = BASE_PATH + 'index.html';
         });
     }
 }

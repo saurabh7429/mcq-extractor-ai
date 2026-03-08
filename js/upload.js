@@ -4,7 +4,7 @@
 
 // Dynamic API_BASE_URL based on deployment
 // Local development: http://localhost:5000/api
-// GitHub Pages: https://mcq-extractor-ai.onrender.com/api
+// GitHub Pages: https://saurabh7429.github.io/mcq-extractor-ai/
 // Render: https://mcq-extractor-ai.onrender.com/api
 const API_BASE_URL = (function() {
     const hostname = window.location.hostname;
@@ -12,12 +12,25 @@ const API_BASE_URL = (function() {
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
         return '/api';
     }
-    // GitHub Pages - use Render API
+    // GitHub Pages - use Render API (since it's a static site)
     if (hostname.includes('github.io')) {
         return 'https://mcq-extractor-ai.onrender.com/api';
     }
     // Render - same origin
     return '/api';
+})();
+
+// Get base path for redirects (works with sub-directory hosting like GitHub Pages)
+const BASE_PATH = (function() {
+    const path = window.location.pathname;
+    // Remove trailing slash and get the base path
+    // For /mcq-extractor-ai/index.html, basePath would be /mcq-extractor-ai/
+    // For /index.html, basePath would be /
+    const lastSlash = path.lastIndexOf('/');
+    if (lastSlash === 0) {
+        return '/';
+    }
+    return path.substring(0, lastSlash + 1);
 })();
 
 // DOM Elements
@@ -285,8 +298,9 @@ async function uploadFile() {
         showSuccess();
 
         // Redirect to preview page after short delay
+        // Use BASE_PATH to handle sub-directory hosting on GitHub Pages
         setTimeout(() => {
-            window.location.href = '/preview';
+            window.location.href = BASE_PATH + 'preview.html';
         }, 1500);
 
     } catch (error) {
@@ -366,8 +380,3 @@ function showSuccess() {
     successMessage.classList.remove('hidden');
 }
 
-// Export for use in other modules
-window.MCQUploader = {
-    removeFile,
-    uploadFile
-};
