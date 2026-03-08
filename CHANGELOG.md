@@ -4,6 +4,58 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Version 2.3.2] - 2026-03-08
+
+### Security Improvements
+
+#### 1. File Size Limit (20MB)
+- **Backend**: Increased MAX_CONTENT_LENGTH from 10MB to 20MB
+- **File Validator**: Updated MAX_FILE_SIZE to 20MB
+- **Frontend**: Updated JavaScript validation to 20MB
+- **UI**: Updated "Max 10MB" to "Max 20MB" in index.html
+
+#### 2. Page Limit (50 pages)
+- Added `MAX_PDF_PAGES = 50` in config
+- Added `validate_page_count()` method in FileValidator
+- Page count validation after PDF upload
+- Returns error if PDF exceeds 50 pages
+
+#### 3. Rate Limiting
+- Implemented in-memory rate limiter in upload.py
+- **Limit**: 15 uploads per minute per IP
+- Returns 429 status when exceeded
+- Uses timestamp-based tracking with automatic cleanup
+
+#### 4. Temporary File Cleanup
+- Added `cleanup_old_files()` function
+- Automatically deletes PDF files older than 1 hour
+- Runs on module load and after each upload
+- Prevents disk storage overflow on Render
+
+#### 5. Error Handling
+- All error responses use standardized format: `{"success": false, "message": "..."}`
+- Created `create_error_response()` helper function
+
+#### 6. Preview Page Routing Fix
+- Added `/preview.html` route in app.py
+- Fixed redirect issue after upload
+
+### Files Modified
+- `backend/config.py` - MAX_CONTENT_LENGTH = 20MB, MAX_PDF_PAGES = 50
+- `backend/utils/file_validator.py` - MAX_FILE_SIZE = 20MB, MAX_PAGES = 50, validate_page_count()
+- `backend/routes/upload.py` - Rate limiting, cleanup, error handling, page validation
+- `backend/app.py` - Added /preview.html route
+- `js/upload.js` - Updated validation to 20MB
+- `index.html` - Updated "Max 20MB"
+
+### Privacy Protection (.gitignore already has)
+- `storage/uploaded_pdfs/` - PDF files protected from git
+- `storage/generated_json/` - JSON files protected from git
+- `.env` - Environment variables protected
+- `*.db` - Database files protected
+
+---
+
 ## [Version 2.0.0] - 2025-02-26
 
 ### Changed

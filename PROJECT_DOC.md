@@ -557,6 +557,39 @@ python run.py
 
 ---
 
+## Security Features
+
+The application includes several security improvements to prevent abuse and protect server resources:
+
+### Upload Security Settings:
+
+| Setting | Value | Description |
+|---------|-------|-------------|
+| Max File Size | 20MB | PDF files larger than 20MB are rejected |
+| Max Pages | 50 | PDFs with more than 50 pages are rejected |
+| Rate Limit | 15/minute/IP | Maximum 15 uploads per minute per IP |
+| Auto Cleanup | 1 hour | Files older than 1 hour are automatically deleted |
+
+### Error Response Format:
+All error responses use standardized JSON format:
+```json
+{
+  "success": false,
+  "message": "Error message here"
+}
+```
+
+### Privacy Protection (.gitignore):
+The following files/directories are protected from git:
+- `storage/uploaded_pdfs/` - Uploaded PDF files
+- `storage/generated_json/` - Generated JSON files  
+- `.env` - Environment variables (API keys)
+- `*.db` - Database files
+
+Clients cannot directly access storage files - all access goes through API endpoints.
+
+---
+
 ## Export Formats
 
 The MCQ Extractor AI supports multiple export formats for your extracted questions:

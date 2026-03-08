@@ -1,27 +1,91 @@
-# TODO: File Upload Security Improvements
+# File Upload Security Improvements - Implementation Complete
 
-## Task List
+## Date: 2026-03-08
+## Version: 2.3.2
 
-### Step 1: Update Configuration (backend/config.py)
-- [x] Change MAX_CONTENT_LENGTH from 10MB to 20MB
+---
 
-### Step 2: Update File Validator (backend/utils/file_validator.py)
-- [x] Change MAX_FILE_SIZE from 10MB to 20MB
-- [x] Add MAX_PAGES = 50 constant
-- [x] Add validate_page_count() method
+## Security Features Implemented:
 
-### Step 3: Implement Rate Limiting (backend/routes/upload.py)
-- [x] Add in-memory rate limiter using Flask-Limiter or custom implementation
-- [x] Configure: 15 uploads per minute per IP
+### 1. File Size Limit (20MB)
+- **Backend**: `backend/config.py` - MAX_CONTENT_LENGTH = 20MB
+- **Backend**: `backend/utils/file_validator.py` - MAX_FILE_SIZE = 20MB
+- **Frontend**: `js/upload.js` - validateFileSize() = 20MB
+- **Frontend**: `index.html` - displays "Max 20MB"
 
-### Step 4: Update Upload Route (backend/routes/upload.py)
-- [x] Add page count validation after PDF is read
-- [x] Add temporary file cleanup after processing
-- [x] Standardize error responses to {"success": false, "message": "..."}
-- [x] Wrap all code in proper error handling
+### 2. Page Limit (50 pages)
+- Added `MAX_PDF_PAGES = 50` in config
+- Added `validate_page_count()` method in FileValidator
+- Page count validation after PDF upload
 
-### Step 5: Add Cleanup Utility
-- [x] Create cleanup function to delete files older than 1 hour
+### 3. Rate Limiting (15 uploads/minute/IP)
+- Implemented in-memory rate limiter in upload.py
+- Returns 429 status when exceeded
 
-## Status: COMPLETED
+### 4. Temporary File Cleanup
+- Added `cleanup_old_files()` function
+- Deletes PDFs older than 1 hour
+- Runs on module load and after each upload
 
+### 5. Error Handling
+- All error responses use `{"success": false, "message": "..."}`
+- Created `create_error_response()` helper
+
+### 6. Preview Page Routing Fix
+- Added `/preview.html` route in app.py
+- Fixed redirect issue after upload
+
+---
+
+## Files Modified:
+
+### Backend Files:
+1. `backend/config.py`
+   - Changed MAX_CONTENT_LENGTH from 10MB to 20MB
+   - Added MAX_PDF_PAGES = 50
+
+2. `backend/utils/file_validator.py`
+   - Changed MAX_FILE_SIZE from 10MB to 20MB
+   - Added MAX_PAGES = 50 constant
+   - Added validate_page_count() method
+
+3. `backend/routes/upload.py`
+   - Added rate limiting (15 uploads/minute/IP)
+   - Added cleanup_old_files() function
+   - Added create_error_response() helper
+   - Added page count validation
+   - Standardized error responses
+
+4. `backend/app.py`
+   - Added `/preview.html` route
+
+### Frontend Files:
+5. `js/upload.js`
+   - Updated validateFileSize to 20MB
+   - Updated error messages for 20MB limit
+
+6. `index.html`
+   - Updated "Max 10MB" to "Max 20MB"
+
+---
+
+## Files NOT Modified:
+- AI extraction pipeline (as requested)
+- Database models
+- Other routes (download, extract, validate)
+
+---
+
+## Already in .gitignore:
+- `storage/uploaded_pdfs/` - PDF files
+- `storage/generated_json/` - JSON files
+- `.env` - Environment variables
+- `*.db` - Database files
+
+---
+
+## Testing Notes:
+- Rate limiting is in-memory (resets on server restart)
+- Cleanup runs on module load and after each upload
+- PDF files are NOT deleted after processing (needed for preview)
+- Old files (>1 hour) are cleaned up automatically

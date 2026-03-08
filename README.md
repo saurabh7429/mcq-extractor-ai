@@ -6,7 +6,7 @@
 ![Flask](https://img.shields.io/badge/Flask-3.0+-green?style=for-the-badge)
 ![AI](https://img.shields.io/badge/AI-GROQ-purple?style=for-the-badge)
 ![Live](https://img.shields.io/badge/Live-Render-brightgreen?style=for-the-badge)
-![Version](https://img.shields.io/badge/Version-2.4.0-blue?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-2.3.2-blue?style=for-the-badge)
 
 ---
 
@@ -42,6 +42,14 @@ Ever had a PDF with 100+ MCQs and wished you had them in a digital format?
 | 🖨️ **Print-Ready** | Direct PDF export for printing |
 | 📝 **DOCX Export** | Word document for question papers |
 | 🔒 **Secure** | Your files stay on server, deleted after processing |
+| 🛡️ **Rate Limited** | 15 uploads/minute per IP to prevent abuse |
+| 📄 **Page Limit** | Max 50 pages per PDF for optimal performance |
+
+### Upload Security Settings:
+- **Max File Size:** 20MB
+- **Max Pages:** 50 pages
+- **Rate Limit:** 15 uploads/minute/IP
+- **Auto Cleanup:** Files older than 1 hour are automatically deleted
 
 ### Export Formats Available:
 
@@ -261,6 +269,22 @@ git push origin main
 - `GROQ_API_KEY` = your key from https://console.groq.com/keys
 
 4. **Done!** 🎉 Your app is live!
+
+---
+
+## 📊 What's New in v2.3.2
+
+### Security Improvements (March 2026):
+- ✅ **File Size Limit:** Increased from 10MB to 20MB
+- ✅ **Page Limit:** Added max 50 pages per PDF
+- ✅ **Rate Limiting:** 15 uploads/minute per IP to prevent abuse
+- ✅ **Auto Cleanup:** Files older than 1 hour are automatically deleted
+- ✅ **Error Handling:** Standardized error responses with JSON format
+- ✅ **Preview Fix:** Fixed /preview.html routing issue
+
+### Privacy Protection:
+- All uploaded files are protected in `.gitignore`
+- Client cannot access storage files directly
 
 ---
 
