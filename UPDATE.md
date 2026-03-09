@@ -13,6 +13,11 @@
   - Cause: `js/stats.js` had hardcoded API path `/api/stats` which doesn't exist on GitHub Pages
   - Solution: Added dynamic API base URL detection (same as other JS files)
 
+- **JavaScript error on all pages**
+  - Problem: `Uncaught SyntaxError: Identifier 'API_BASE_URL' has already been declared`
+  - Cause: Multiple JS files declare `const API_BASE_URL`, causing conflict when loaded together
+  - Solution: Added check `if (typeof API_BASE_URL === 'undefined')` before declaring
+
 #### How it works now:
 | Deployment | API URL | Behavior |
 |------------|---------|----------|
@@ -23,12 +28,13 @@
 #### Files Modified:
 | File | Change Type | Description |
 |------|-------------|-------------|
-| `js/stats.js` | Modified | Added dynamic API_BASE_URL detection |
+| `js/stats.js` | Modified | Added dynamic API_BASE_URL detection with duplicate check |
 
 #### Technical Details:
 - Added IIFE (Immediately Invoked Function Expression) to detect hostname
 - Uses `window.location.hostname` to determine deployment environment
 - Follows same pattern as `js/upload.js` and `js/preview.js`
+- Added check to prevent duplicate variable declaration
 
 ---
 
