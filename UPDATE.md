@@ -4,7 +4,35 @@
 
 ---
 
-### Update 004 - 2026-03-08
+### Update 005 - 2025-03-09
+**Type**: Bug Fix (Minor Update: 2.6.0 → 2.6.1)
+
+#### Issue Fixed:
+- **Like/Dislike buttons not working on GitHub Pages**
+  - Problem: Stats (likes/dislikes) were not showing on https://saurabh7429.github.io/mcq-extractor-ai/
+  - Cause: `js/stats.js` had hardcoded API path `/api/stats` which doesn't exist on GitHub Pages
+  - Solution: Added dynamic API base URL detection (same as other JS files)
+
+#### How it works now:
+| Deployment | API URL | Behavior |
+|------------|---------|----------|
+| Localhost | `/api/stats` | Same origin requests |
+| GitHub Pages | `https://mcq-extractor-ai.onrender.com/api/stats` | Proxies to Render backend |
+| Render | `/api/stats` | Same origin requests |
+
+#### Files Modified:
+| File | Change Type | Description |
+|------|-------------|-------------|
+| `js/stats.js` | Modified | Added dynamic API_BASE_URL detection |
+
+#### Technical Details:
+- Added IIFE (Immediately Invoked Function Expression) to detect hostname
+- Uses `window.location.hostname` to determine deployment environment
+- Follows same pattern as `js/upload.js` and `js/preview.js`
+
+---
+
+### Update 004 - 2025-03-08
 **Type**: Feature Enhancement (Minor Update: 2.5.0 → 2.6.0)
 
 #### New Features - Quiz Completion Messages
