@@ -3,27 +3,24 @@
  * Handles fetching and updating statistics with anti-spam protection
  */
 
-// Dynamic API_BASE_URL based on deployment (check if already defined)
-if (typeof API_BASE_URL === 'undefined') {
-    var API_BASE_URL = (function() {
-        const hostname = window.location.hostname;
-        
-        // Localhost or 127.0.0.1
-        if (hostname === 'localhost' || hostname === '127.0.0.1') {
-            return '/api';
-        }
-        // GitHub Pages - redirect to Render backend
-        if (hostname.includes('github.io')) {
-            return 'https://mcq-extractor-ai.onrender.com/api';
-        }
-        // Render - same origin
-        return '/api';
-    })();
-}
+// Centralized API base URL - works for both local, Render, and GitHub Pages
+const API_BASE = (function() {
+    const hostname = window.location.hostname;
+    // For local development, use relative paths
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return '/api/stats';
+    }
+    // For GitHub Pages, use the Render backend
+    if (hostname.includes('github.io')) {
+        return 'https://mcq-extractor-ai.onrender.com/api/stats';
+    }
+    // For Render or other production deployments, use relative paths
+    return '/api/stats';
+})();
 
 const StatsManager = {
-    // API base URL - dynamically set based on deployment
-    API_BASE: API_BASE_URL + '/stats',
+    // API base URL for stats
+    API_BASE: API_BASE,
     
     /**
      * Fetch current statistics from server

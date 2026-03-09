@@ -4,6 +4,33 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Version 2.6.1] - 2026-03-08
+
+### Fix - GitHub Pages Like/Dislike System
+
+#### Problem
+- Like/Dislike system worked on Render deployment but NOT on GitHub Pages
+- GitHub Pages is static hosting and cannot run backend APIs
+- API calls used relative paths like `/api/stats` which don't exist on GitHub Pages
+
+#### Solution - Centralized API Base URL
+- Created centralized `API_BASE` constant in stats.js
+- Detects hosting environment and routes API calls accordingly:
+  - **Local development (localhost/127.0.0.1)**: Uses relative paths `/api/stats`
+  - **GitHub Pages**: Uses Render backend `https://mcq-extractor-ai.onrender.com/api/stats`
+  - **Render deployment**: Uses relative paths `/api/stats`
+
+#### Files Modified
+- `js/stats.js` - Added centralized API_BASE with environment detection
+
+#### Benefits
+- Works seamlessly on both GitHub Pages (frontend only) and Render (full stack)
+- No backend changes required
+- Consistent with existing pattern in upload.js and preview.js
+- Lightweight implementation suitable for Render free tier (512MB RAM)
+
+---
+
 ## [Version 2.6.0] - 2026-03-08
 
 ### New Features - Quiz Completion Messages
