@@ -1580,3 +1580,312 @@ input:focus-visible {
     background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
 }
 
+/* ==================== Statistics Section ==================== */
+.stats-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-lg);
+    flex-wrap: wrap;
+    padding: var(--space-lg);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-xl);
+    margin-top: var(--space-xl);
+    border: 1px solid var(--border);
+}
+
+.stats-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+}
+
+.stats-item svg {
+    width: 20px;
+    height: 20px;
+    color: var(--primary);
+}
+
+.stats-value {
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 1.125rem;
+}
+
+.stats-divider {
+    width: 1px;
+    height: 24px;
+    background: var(--border);
+}
+
+.stats-actions {
+    display: flex;
+    gap: var(--space-md);
+}
+
+.stats-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.stats-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.stats-btn:hover:not(:disabled) {
+    border-color: var(--primary);
+    background: rgba(79, 70, 229, 0.1);
+}
+
+.stats-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.stats-btn.like-btn:hover:not(:disabled) {
+    border-color: var(--secondary);
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--secondary);
+}
+
+.stats-btn.dislike-btn:hover:not(:disabled) {
+    border-color: var(--danger);
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+}
+
+.stats-btn.voted {
+    background: var(--bg-tertiary);
+    color: var(--text-tertiary);
+}
+
+/* ==================== Social Links ==================== */
+.footer-social {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    color: var(--text-secondary);
+    transition: all var(--transition-base);
+    background: var(--bg-secondary);
+}
+
+.social-link:hover {
+    transform: translateY(-2px);
+}
+
+.social-link svg {
+    width: 20px;
+    height: 20px;
+}
+
+.social-link.github:hover {
+    background: #24292e;
+    color: white;
+}
+
+.social-link.instagram:hover {
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    color: white;
+}
+
+.social-link.telegram:hover {
+    background: #0088cc;
+    color: white;
+}
+
+/* ==================== Social Links ==================== */
+.footer-social {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+}
+
+@media (min-width: 640px) {
+    .footer-social {
+        margin-top: 0;
+    }
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all var(--transition-base);
+}
+
+.social-link:hover {
+    transform: translateY(-2px);
+    color: white;
+}
+
+.social-link.github:hover {
+    background: #24292e;
+}
+
+.social-link.instagram:hover {
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+}
+
+.social-link.telegram:hover {
+    background: #0088cc;
+}
+
+.social-link svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* ==================== Statistics Section ==================== */
+.stats-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-lg);
+    padding: var(--space-md) var(--space-lg);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-xl);
+    margin-bottom: var(--space-xl);
+    flex-wrap: wrap;
+}
+
+.stats-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+    font-weight: 500;
+}
+
+.stats-item svg {
+    width: 20px;
+    height: 20px;
+    color: var(--primary);
+}
+
+.stats-item .stats-value {
+    color: var(--text-primary);
+    font-weight: 700;
+    min-width: 24px;
+}
+
+.stats-divider {
+    width: 1px;
+    height: 24px;
+    background: var(--border);
+}
+
+/* Like/Dislike Buttons */
+.stats-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.stats-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.stats-btn:hover:not(:disabled) {
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-1px);
+}
+
+.stats-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.stats-btn.like-btn:hover:not(:disabled) {
+    border-color: var(--secondary);
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--secondary);
+}
+
+.stats-btn.dislike-btn:hover:not(:disabled) {
+    border-color: var(--danger);
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+}
+
+.stats-btn.voted {
+    cursor: default;
+}
+
+.stats-btn.voted.like-btn {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: var(--secondary);
+    color: var(--secondary);
+}
+
+.stats-btn.voted.dislike-btn {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+.stats-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Mobile responsive stats */
+@media (max-width: 480px) {
+    .stats-section {
+        flex-direction: column;
+        gap: var(--space-md);
+        padding: var(--space-lg);
+    }
+    
+    .stats-divider {
+        width: 80%;
+        height: 1px;
+    }
+    
+    .stats-actions {
+        width: 100%;
+        justify-content: center;
+    }
+}
+

@@ -32,6 +32,13 @@ def extract_mcq():
     """
     logger.info("Starting MCQ extraction process")
     
+    # Increment view count
+    try:
+        from backend.routes.stats import increment_view
+        increment_view()
+    except Exception as e:
+        logger.warning(f"Could not increment view count: {e}")
+    
     # Check if file is in request
     if 'file' not in request.files:
         logger.warning("No file provided in request")

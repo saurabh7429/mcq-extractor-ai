@@ -1,643 +1,471 @@
 # MCQ Extractor AI - Complete Project Documentation
 
 ## Table of Contents
-1. [What is this Project?](#what-is-this-project)
-2. [How it Works (Flow)](#how-it-works-flow)
-3. [Project Structure](#project-structure)
-4. [Technology Stack](#technology-stack)
-5. [How to Use](#how-to-use)
-6. [How to Update/Modify](#how-to-updatemodify)
-7. [Deployment Guide](#deployment-guide)
-8. [Troubleshooting](#troubleshooting)
-9. [FAQ](#faq)
+1. [Project Overview](#project-overview)
+2. [Feature List](#feature-list)
+3. [System Architecture](#system-architecture)
+4. [AI Usage Policy](#ai-usage-policy)
+5. [Export Architecture](#export-architecture)
+6. [Quiz System Documentation](#quiz-system-documentation)
+7. [Statistics System](#statistics-system)
+8. [Deployment Notes](#deployment-notes)
+9. [File Structure](#file-structure)
+10. [API Documentation](#api-documentation)
 
 ---
 
-## What is this Project?
+## Project Overview
 
-**MCQ Extractor AI** ek web application hai jo PDF files se MCQs (Multiple Choice Questions) extract karta hai using AI.
+**MCQ Extractor AI** is a web application that extracts Multiple Choice Questions (MCQs) from PDF files using artificial intelligence.
 
-### Simple Explanation:
-1. Tum ek PDF file upload karte ho jisme questions hain
-2. AI us PDF ko padhta hai aur questions find karta hai
-3. Questions, options aur correct answers JSON format mein milte hain
-4. Tum download kar sakte ho ya preview dekh sakte ho
+### What It Does:
+1. **Upload PDF** - User uploads a PDF file containing questions
+2. **AI Extraction** - AI reads and extracts all MCQs with options and correct answers
+3. **Structured Data** - Returns JSON with questions, 4 options, and correct answer index
+4. **Export Options** - Download in multiple formats or generate quizzes
+
+### Simple Flow:
+```
+PDF Upload → AI Extraction → Structured MCQs → Export/Quiz
+```
 
 ---
 
-## How it Works (Flow)
+## Feature List
 
-### Detailed Technical Workflow
+### Core Features:
+- ✅ **PDF to MCQ Extraction** - Uses AI to extract questions from PDF files
+- ✅ **MASTER JSON System** - Central JSON storage for all extracted MCQs
+- ✅ **Multi Format Export** - Export to JSON, CSV, TXT, Markdown, HTML, XML, YAML, SQL, Aiken, GIFT, Excel
+- ✅ **Print-Ready Exports** - Question Paper PDF, Answer Key PDF, OMR Sheet PDF, Tabular PDF, DOCX
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                         COMPLETE WORKFLOW                                   │
-└─────────────────────────────────────────────────────────────────────────────┘
+### Quiz Features:
+- ✅ **Question Filtering** - Filter questions in preview
+- ✅ **Remove Unwanted MCQs** - Delete unwanted questions from selection
+- ✅ **Question Selection** - Select specific questions for quiz
+- ✅ **Quiz Generator** - Generate quizzes from selected questions
+- ✅ **Random Quiz Generation** - Generate random subset quizzes (10, 25, 50, 80, 100 or custom)
+- ✅ **Exam Mode** - Timer-based exam with anti-cheat measures
+- ✅ **Quiz Progress Bar** - Visual progress indicator with correct/wrong counts
+- ✅ **Restart Quiz Option** - Restart with same or new random questions
 
-STEP 1: USER UPLOADS PDF
-┌──────────────┐
-│ User clicks  │         Browser (index.html)
-│ "Upload"     │
-└──────┬───────┘
-       │ FormData with PDF file
-       ▼
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ 1. upload.js sends PDF to:                                                  │
-│    POST /api/upload/file                                                    │
-│                                                                              │
-│    Content-Type: multipart/form-data                                        │
-│    Body: file (PDF)                                                        │
-└──────────────────────────────────────────────────────────────────────────────┘
-       │
-       ▼
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ 2. BACKEND: upload.py                                                      │
-│    ┌─────────────────────────────────────────────────────────────────────┐ │
-│    │ • Validate file (extension, size, type)                           │ │
-│    │ • Generate unique file_id (UUID)                                   │ │
-│    │ • Save PDF to: storage/uploaded_pdfs/<uuid>_filename.pdf          │ │
-│    │ • Save metadata to database                                        │ │
-│    └─────────────────────────────────────────────────────────────────────┘ │
-└──────────────────────────────────────────────────────────────────────────────┘
-       │
-       ▼ Returns: {"status": "success", "file_id": "abc-123", ...}
-       │
-       ▼
-STEP 2: EXTRACT MCQs
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ 3. upload.js sends request to:                                              │
-│    POST /api/extract/<file_id>                                             │
-│                                                                              │
-│    (This can also be a separate call OR embedded in upload response)        │
-└──────────────────────────────────────────────────────────────────────────────┘
-       │
-       ▼
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ 4. BACKEND: extract.py                                                      │
-│    ┌─────────────────────────────────────────────────────────────────────┐ │
-│    │ a) PDF Reader (pdf_reader.py)                                       │ │
-│    │    • Read PDF from: storage/uploaded_pdfs/<uuid>_filename.pdf      │ │
-│    │    • Extract text using pypdf library                               │ │
-│    │    • Returns: text_content (string), page_count                   │ │
-│    │                                                                     │ │
-│    │ b) AI Processor (ai_processor.py)                                   │ │
-│    │    • Send text to GROQ API                                          │ │
-│    │    • Endpoint: https://api.groq.com/openai/v1/chat/completions     │ │
-│    │    • Model: llama-3.1-8b-instant                                    │ │
-│    │    • Prompt: Extract MCQs from text...                              │ │
-│    │    • Returns: raw MCQ data (JSON)                                   │ │
-│    │                                                                     │ │
-│    │ c) JSON Formatter (json_formatter.py)                               │ │
-│    │    • Clean and validate MCQs                                        │ │
-│    │    • Ensure 4 options per question                                  │ │
-│    │    • Set correct_answer index (0-3)                                │ │
-│    │                                                                     │ │
-│    │ d) Storage Service (storage_service.py)                             │ │
-│    │    • Save JSON to: storage/generated_json/<uuid>.json             │ │
-│    │    • Save to database                                               │ │
-│    └─────────────────────────────────────────────────────────────────────┘ │
-└──────────────────────────────────────────────────────────────────────────────┘
-       │
-       ▼ Returns: {"success": true, "mcqs": [...], "count": 10}
-       │
-       ▼
-STEP 3: SHOW RESULT
-┌──────────────┐
-│ Browser      │
-│ receives JSON│
-│ & shows      │
-│ preview      │
-└──────────────┘
-```
+### UI/UX Features:
+- ✅ **Like/Dislike System** - Users can vote on the application
+- ✅ **View Counter** - Tracks total PDF extractions
+- ✅ **Social Links Integration** - GitHub, Instagram, Telegram links
+- ✅ **Responsive UI** - Works on mobile, tablet, and desktop
 
-### API Calls Detail:
+---
 
-| Call # | URL | Method | Purpose |
-|--------|-----|--------|---------|
-| 1 | `/api/upload/file` | POST | Upload PDF to server |
-| 2 | `/api/extract/<file_id>` | POST | Extract MCQs from PDF |
+## System Architecture
 
-**Total API Calls: 2**
-
-(First call saves PDF, second call processes and returns MCQs)
-
-### Data Storage Locations:
+### Pipeline Flow:
 
 ```
-Project Folder/
-│
-├── storage/
-│   ├── uploaded_pdfs/
-│   │   └── 744a8cec-e5f2-4921-9516-99a7bd08d08b_test.pdf  ← PDF Yahan
-│   │
-│   └── generated_json/
-│       └── 744a8cec-e5f2-4921-9516-99a7bd08d08b.json     ← MCQs Yahan
-│
-└── database/
-    └── mcq.db  ← Metadata (file_id, filename, timestamps) Yahan
+┌─────────────────┐
+│   Upload PDF    │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  PDF Reader     │  ← pypdf extracts text from PDF
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ AI Processor    │  ← Groq Llama 3.1 8B model
+│ (GROQ API)      │    processes text → MCQs
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ JSON Formatter  │  ← Validates & cleans data
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ MASTER JSON     │  ← Central storage
+└────────┬────────┘
+         │
+    ┌────┴────┐
+    ▼         ▼
+┌───────┐ ┌───────┐
+│Export │ │ Quiz  │
+│System │ │System │
+└───────┘ └───────┘
 ```
 
-### Step-by-Step Data Flow:
+### Detailed Steps:
+
+1. **PDF Upload** - User uploads PDF via `/api/upload/file`
+2. **PDF Reader** - Backend reads text using pypdf
+3. **AI Processor** - Sends text to GROQ API (Llama 3.1 8B)
+4. **JSON Formatter** - Validates and structures MCQ data
+5. **MASTER JSON** - Saves to `storage/generated_json/`
+6. **Export/Quiz** - User exports or generates quiz
+
+---
+
+## AI Usage Policy
+
+### AI is ONLY used for:
+- **PDF → MCQ Extraction** - Converting PDF text to structured MCQs
+
+### NOT using AI for:
+- ❌ Quiz generation (all local JavaScript)
+- ❌ Export formats (all local Python)
+- ❌ Filtering questions (all local JavaScript)
+- ❌ Statistics (all local JSON storage)
+
+### Benefits:
+- Minimal AI calls (only 1 per PDF)
+- Lower costs (GROQ free tier lasts longer)
+- Faster operations (exports & quiz are instant)
+- Works offline for exports (no API needed)
+
+---
+
+## Export Architecture
+
+### Export Pipeline:
 
 ```
-1. USER ACTION
-   │
-   ▼
-2. JAVASCRIPT (upload.js)
-   • Creates FormData object
-   • Adds PDF file to it
-   • Sends POST request to /api/upload/file
-   │
-   FLASK SERVER (app.py)
-   ▼
-3. • Receives request
-   • Routes to upload.py
-   │
-   ▼
-4. UPLOAD.PY
-   • Validates file (type, size)
-   • Generates UUID: 744a8cec-e5f2-4921-9516-99a7bd08d08b
-   • Saves to: storage/uploaded_pdfs/744a8cec-e5f2_test.pdf
-   • Returns: {"file_id": "744a8cec...", "status": "success"}
-   │
-   ▼
-5. UPLOAD.JS (receives response)
-   • Gets file_id from response
-   • Calls /api/extract/744a8cec...
-   │
-   ▼
-6. EXTRACT.PY
-   • Reads PDF: storage/uploaded_pdfs/744a8cec_test.pdf
-   • Extracts text using pypdf
-   │
-   ▼
-7. AI_PROCESSOR.PY
-   • Sends text to GROQ API
-   • URL: https://api.groq.com/openai/v1/chat/completions
-   • Model: llama-3.1-8b-instant
-   • Returns: raw MCQ JSON
-   │
-   ▼
-8. JSON_FORMATTER.PY
-   • Cleans the data
-   • Validates each question has 4 options
-   • Sets correct answer index
-   │
-   ▼
-9. STORAGE_SERVICE.PY
-   • Saves JSON: storage/generated_json/744a8cec.json
-   │
-   ▼
-10. Returns to browser:
-    {"success": true, "mcqs": [...], "count": 10}
+MASTER JSON
     │
     ▼
-11. PREVIEW.JS
-    • Receives MCQs array
-    • Creates HTML cards for each question
-    • Displays on preview.html
+┌─────────────────┐
+│ export_service  │  ← Python export module
+└────────┬────────┘
+         │
+    ┌────┴────────────────────────────┐
+    ▼    ▼     ▼     ▼      ▼     ▼      ▼
+┌────┐ ┌───┐ ┌───┐ ┌────┐ ┌───┐ ┌────┐ ┌───┐
+│JSON│ │CSV│ │TXT│ │HTML│ │XML│ │YAML│ │SQL│
+└────┘ └───┘ └───┘ └────┘ └───┘ └────┘ └───┘
+    │    │    │     │     │     │     │
+    └────┴────┴─────┴─────┴─────┴─────┘
+                    │
+                    ▼
+               ┌──────────┐
+               │   20+     │
+               │  Formats │
+               └──────────┘
 ```
 
-### Database Schema:
+### Available Export Formats:
 
-```sql
--- PDFs table
-CREATE TABLE pdfs (
-    id INTEGER PRIMARY KEY,
-    file_id TEXT UNIQUE,        -- UUID: 744a8cec-e5f2-4921-9516-99a7bd08d08b
-    original_filename TEXT,     -- test.pdf
-    stored_filename TEXT,        -- 744a8cec_test.pdf
-    file_path TEXT,             -- full path
-    file_size INTEGER,          -- bytes
-    mime_type TEXT,             -- application/pdf
-    page_count INTEGER,         -- number of pages
-    created_at TIMESTAMP        -- upload time
-);
+**Digital Formats:**
+| Format | Description |
+|--------|-------------|
+| JSON | Raw MCQ data |
+| CSV | Spreadsheet format |
+| TXT | Plain text |
+| Markdown | Formatted text |
+| HTML | Web page |
+| XML | Structured data |
+| YAML | Configuration format |
+| SQL | Database insert |
+| Aiken | Moodle format |
+| GIFT | Moodle import |
+| Excel | Spreadsheet |
 
--- MCQs table
-CREATE TABLE mcqs (
-    id INTEGER PRIMARY KEY,
-    file_id TEXT,               -- links to pdfs table
-    question TEXT,              -- question text
-    options TEXT,               -- JSON array of options
-    correct_answer INTEGER,     -- 0, 1, 2, or 3
-    explanation TEXT,           -- optional explanation
-    created_at TIMESTAMP
-);
-```
-
-### Code Flow (File to File):
-
-```
-FRONTEND (Browser)
-       │
-       │ index.html → upload.js
-       ▼
-BACKEND (Flask)
-       │
-       ├── app.py (routes request)
-       │
-       ├── routes/
-       │    ├── upload.py (handles file upload)
-       │    └── extract.py (handles MCQ extraction)
-       │
-       ├── services/
-       │    ├── pdf_reader.py (reads PDF)
-       │    ├── ai_processor.py (calls GROQ API)
-       │    └── json_formatter.py (formats response)
-       │
-       └── storage_service.py (saves files)
-              │
-              ▼
-       storage/ (files on disk)
-       database/ (SQLite)
-```
-
-### Important Functions:
-
-| File | Function | Purpose |
-|------|----------|---------|
-| `upload.py` | `upload_file()` | Handle PDF upload |
-| `extract.py` | `extract_text_from_file()` | Main extraction logic |
-| `pdf_reader.py` | `read_pdf_from_storage(file_id)` | Read PDF and return text |
-| `ai_processor.py` | `extract_mcq(text)` | Send to GROQ, get MCQs |
-| `json_formatter.py` | `format_mcq(raw_mcqs)` | Clean and validate |
-| `storage_service.py` | `save_upload(file, filename)` | Save PDF to disk |
-| `storage_service.py` | `save_json_by_uuid(json, file_id)` | Save JSON |
+**Print-Ready Formats:**
+| Format | Description |
+|--------|-------------|
+| Question Paper PDF | Print without answers |
+| Answer Key PDF | Teacher's copy |
+| OMR Sheet PDF | Bubble answer sheets |
+| Tabular PDF | Table format |
+| DOCX | Word document |
 
 ---
 
-## Project Structure
+## Quiz System Documentation
+
+### Quiz Generation Flow:
+
+```
+Extracted MCQs (from Preview)
+         │
+         ▼
+┌─────────────────────────┐
+│   Question Selection    │  ← User selects questions
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│   Quiz Configuration   │  ← All or Random
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│   Quiz Generator        │  ← Generates quiz session
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│   Quiz Interface        │  ← One question at a time
+│   (quiz.html)           │
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│   Result Screen         │  ← Shows score + message
+└─────────────────────────┘
+```
+
+### Quiz Features:
+
+1. **Question Selection** - Checkbox selection in preview
+2. **Select All/Deselect All** - Quick selection buttons
+3. **Remove Unwanted** - Delete questions before quiz
+4. **Quiz Types:**
+   - All Questions - Use all selected questions
+   - Random - Choose specific number (10, 25, 50, 80, 100, custom)
+
+5. **Quiz Interface:**
+   - One question at a time
+   - Clickable options with instant feedback
+   - Correct (green) / Wrong (red) highlighting
+   - Previous/Next navigation
+   - Progress bar with percentage
+
+6. **Result Screen:**
+   - Correct/Wrong count
+   - Percentage score
+   - **26+ Compliment Messages** (randomly selected)
+   - Restart options
+
+### Quiz Result Messages (26+ Messages):
+
+| Score Range | Messages |
+|-------------|----------|
+| 90-100% | "Perfect Score!", "Outstanding!", "Marvelous!", "Phenomenal!", "Excellent!" |
+| 80-89% | "Awesome!", "Superb!", "Impressive!", "Terrific!", "Great Job!" |
+| 70-79% | "Well Done!", "Nice Work!", "Great Effort!", "Thumbs Up!", "Good Work!" |
+| 60-69% | "Decent Job!", "Nice Try!", "Keep Going!", "Not Bad!", "Good!" |
+| 50-59% | "Almost There!", "Good Start!", "Keep Trying!", "Fair Attempt!" |
+| Below 50% | "Don't Give Up!", "Stay Positive!", "Keep Learning!", "You Can Do It!" |
+
+---
+
+## Statistics System
+
+### Statistics Tracked:
+
+| Stat | Trigger | Storage |
+|------|---------|---------|
+| **Views** | Every PDF extraction | `storage/stats.json` |
+| **Likes** | User clicks like button | `storage/stats.json` |
+| **Dislikes** | User clicks dislike button | `storage/stats.json` |
+
+### Rules:
+
+1. **Views:**
+   - Automatically increments when `/api/extract` is called
+   - Tracks total PDF extractions
+
+2. **Likes:**
+   - Increments when user clicks ❤️ button
+   - Protected by browser localStorage (1 vote per browser)
+
+3. **Dislikes:**
+   - Increments when user clicks 👎 button
+   - Protected by browser localStorage (1 vote per browser)
+
+### Anti-Spam Protection:
+- Uses browser localStorage to track votes
+- Same browser cannot vote multiple times
+- Buttons disabled after voting with visual feedback
+
+---
+
+## Deployment Notes
+
+### Optimized for Render Free Tier:
+
+| Resource | Limit | Optimization |
+|----------|-------|--------------|
+| **RAM** | 512MB | Lightweight libraries (~7MB) |
+| **Bandwidth** | 750 hours/month | Minimal AI calls |
+| **Disk** | 1GB | Auto-cleanup after 1 hour |
+
+### Performance Optimizations:
+
+1. **Minimal AI Usage:**
+   - Only 1 API call per PDF
+   - No AI for exports (all local Python)
+   - No AI for quiz (all local JavaScript)
+
+2. **Lightweight Libraries:**
+   - pypdf (PDF reading)
+   - reportlab (PDF generation)
+   - python-docx (Word docs)
+   - openpyxl (Excel)
+
+3. **File Cleanup:**
+   - Auto-delete PDFs older than 1 hour
+   - Auto-delete JSON after download option
+
+4. **Token Optimization:**
+   - Groq Llama 3.1 8B (efficient model)
+   - Optimized prompts for minimal tokens
+   - Production: Llama 3.3 70B for quality
+
+---
+
+## File Structure
 
 ```
 mcq-extractor-ai/
 │
-├── backend/                    # Server-side code (Python/Flask)
-│   ├── app.py                  # Main Flask application
-│   ├── config.py               # Configuration (API keys, settings)
-│   │
-│   ├── routes/                 # API Endpoints (URLs)
-│   │   ├── upload.py           # POST /api/upload/file - PDF upload
-│   │   ├── extract.py          # GET/POST /api/extract/<id> - MCQ extraction
-│   │   ├── download.py         # GET /api/download/<id> - JSON download
-│   │   └── validate.py         # POST /api/validate - File validation
-│   │
-│   ├── services/               # Business Logic
-│   │   ├── ai_processor.py    # AI se MCQ extract karta hai
-│   │   ├── pdf_reader.py       # PDF se text extract karta hai
-│   │   ├── json_formatter.py   # JSON format banata hai
-│   │   └── storage_service.py  # Files save/load karta hai
-│   │
-│   ├── models/                 # Database
-│   │   ├── database.py         # Database connection
-│   │   ├── mcq_model.py       # MCQ data model
-│   │   └── pdf_model.py       # PDF data model
-│   │
-│   └── utils/                 # Helper Functions
-│       ├── error_handler.py    # Error handling
-│       ├── file_validator.py  # File validation
-│       └── helpers.py         # Utility functions
-│
-├── frontend/                  # User Interface (HTML/CSS/JS)
-│   ├── index.html             # Home page (upload PDF)
-│   ├── preview.html           # Preview page (show MCQs)
+├── 🖥️  frontend/              # Web UI (HTML/CSS/JS)
+│   ├── index.html             # Upload page
+│   ├── preview.html           # Results page with export options
+│   ├── quiz.html              # Quiz interface
 │   ├── css/
-│   │   └── styles.css        # Styling
+│   │   ├── styles.css         # Main styling
+│   │   └── quiz.css           # Quiz-specific styles
 │   └── js/
-│       ├── upload.js          # Upload functionality
-│       ├── preview.js         # Preview functionality
-│       ├── status.js          # Status messages
-│       └── download.js        # Download functionality
+│       ├── upload.js          # File upload handling
+│       ├── preview.js         # MCQ display, selection, export
+│       ├── quiz.js            # Quiz logic & result messages
+│       ├── stats.js           # Statistics display & voting
+│       ├── download.js        # Download functionality
+│       └── status.js          # Status messages
 │
-├── storage/                   # File Storage
-│   ├── uploaded_pdfs/         # PDFs yahan save hoti hain
-│   └── generated_json/        # Generated JSON files
+├── ⚙️   backend/              # Server (Python/Flask)
+│   ├── app.py                # Main Flask application
+│   ├── config.py             # Configuration (API keys, limits)
+│   ├── routes/               # API endpoints
+│   │   ├── upload.py         # POST /api/upload/file
+│   │   ├── extract.py       # POST /api/extract/<file_id>
+│   │   ├── download.py      # GET /api/download/*
+│   │   ├── stats.py         # GET/POST /api/stats/*
+│   │   └── validate.py      # POST /api/validate
+│   ├── services/             # Core business logic
+│   │   ├── ai_processor.py   # Groq AI integration
+│   │   ├── pdf_reader.py    # PDF text extraction
+│   │   ├── json_formatter.py # Format & validate MCQs
+│   │   ├── export_service.py # Export to all formats
+│   │   └── storage_service.py # File I/O operations
+│   ├── models/               # Database models
+│   │   ├── database.py
+│   │   ├── mcq_model.py
+│   │   └── pdf_model.py
+│   └── utils/               # Helper utilities
+│       ├── error_handler.py
+│       ├── file_validator.py
+│       └── helpers.py
 │
-├── database/                  # SQLite Database
-│   └── mcq.db               # All data yahan save hota hai
+├── 💾  storage/              # File storage
+│   ├── uploaded_pdfs/        # Uploaded PDFs (auto-cleaned)
+│   ├── generated_json/        # Output JSON files
+│   └── stats.json            # Statistics data
 │
-├── logs/                      # Application Logs
-│   └── app.log              # Error logs
-│
-├── tests/                     # Testing Files
-│   ├── test_ai_processor.py
-│   ├── test_pdf_reader.py
-│   └── test_routes.py
-│
-├── requirements.txt           # Python packages
-├── run.py                    # Application start point
-├── .env                      # Environment variables (API keys)
-├── render.yaml              # Render deployment config
-└── DEPLOY.md                # Deployment guide
+├── 📊  database/             # SQLite database
+├── 📝  requirements.txt       # Python packages
+├── 🚀  run.py               # Application entry point
+├── 🔧  render.yaml          # Render deployment config
+└── 📚  Documentation         # README, CHANGELOG, etc.
 ```
 
 ---
 
-## Technology Stack
+## API Documentation
 
-### Backend:
-| Technology | Purpose |
-|------------|---------|
-| **Python** | Programming language |
-| **Flask** | Web framework (handles API) |
-| **GROQ API** | AI service (Llama 3.1 model) |
-| **SQLite** | Database |
-| **pypdf** | PDF reading |
-| **gunicorn** | Production server |
+### Core Endpoints:
 
-### Frontend:
-| Technology | Purpose |
-|------------|---------|
-| **HTML5** | Page structure |
-| **CSS3** | Styling & design |
-| **JavaScript** | Interactivity |
-| **Fetch API** | API calls |
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/upload/file` | POST | Upload PDF file |
+| `/api/extract/<file_id>` | POST | Extract MCQs from PDF |
+| `/api/download/<file_id>` | GET | Download original JSON |
+| `/api/download/export/<format>/<file_id>` | GET | Export in specified format |
+| `/api/download/list` | GET | List all files |
+| `/api/download/export/formats` | GET | Get supported formats |
+| `/api/health` | GET | Server health check |
+
+### Statistics Endpoints:
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/stats` | GET | Get current statistics |
+| `/api/stats/like` | POST | Increment likes |
+| `/api/stats/dislike` | POST | Increment dislikes |
+| `/api/stats/view` | POST | Increment views (auto-called) |
+
+### Export Formats:
+
+```
+/api/download/export/json/<file_id>      # JSON
+/api/download/export/csv/<file_id>       # CSV
+/api/download/export/txt/<file_id>       # TXT
+/api/download/export/markdown/<file_id>  # Markdown
+/api/download/export/html/<file_id>      # HTML
+/api/download/export/xml/<file_id>       # XML
+/api/download/export/yaml/<file_id>      # YAML
+/api/download/export/sql/<file_id>       # SQL
+/api/download/export/aiken/<file_id>     # Aiken format
+/api/download/export/gift/<file_id>      # GIFT format
+/api/download/export/excel/<file_id>     # Excel (XLSX)
+
+/api/download/export/question_pdf/<file_id>    # Question Paper PDF
+/api/download/export/answer_key_pdf/<file_id>  # Answer Key PDF
+/api/download/export/omr_pdf/<file_id>         # OMR Sheet PDF
+/api/download/export/tabular_pdf/<file_id>     # Tabular PDF
+/api/download/export/docx/<file_id>            # DOCX Question Paper
+```
 
 ---
 
-## How to Use
+## Quick Start
 
-### For Users:
-1. **Open Website** → https://mcq-extractor-ai.onrender.com
-2. **Upload PDF** → Click or drag-drop PDF file
-3. **Wait** → AI process kar raha hai
-4. **Preview** → Questions dekh sakte hain
-5. **Download** → JSON format mein download kar sakte hain
-
-### For Developers (Local Run):
+### Local Development:
 
 ```bash
-# 1. Clone
-git clone https://github.com/your-username/mcq-extractor-ai.git
+# Clone
+git clone https://github.com/saurabh7429/mcq-extractor-ai.git
 cd mcq-extractor-ai
 
-# 2. Create virtual environment
+# Create venv
 python -m venv venv
-venv\Scripts\activate      # Windows
-# source venv/bin/activate  # Mac/Linux
+venv\Scripts\activate  # Windows
 
-# 3. Install packages
+# Install
 pip install -r requirements.txt
 
-# 4. Create .env file
+# Setup API key
 copy .env.example .env
-# Edit .env and add: GROQ_API_KEY=your_key_here
+# Edit .env: GROQ_API_KEY=your_key
 
-# 5. Run
+# Run
 python run.py
 
-# 6. Open browser
+# Open
 http://localhost:5000
 ```
 
----
+### Deploy to Render:
 
-## How to Update/Modify
-
-### Common Changes aur Unke Prompts:
-
-#### 1. Change AI Model
-**Prompt for AI:**
-```
-Change the AI model from Llama to another model in ai_processor.py.
-Use "mixtral-8x7b-32768" model instead.
-```
-
-#### 2. Add New Feature (e.g., Export to Excel)
-**Prompt for AI:**
-```
-Add a new route in backend/routes/download.py to export MCQs to Excel format.
-Create a function that converts JSON to Excel using openpyxl library.
-```
-
-#### 3. Change Frontend Design
-**Prompt for AI:**
-```
-Update the CSS in frontend/css/styles.css to change the color scheme from 
-purple to blue gradient. Also update the button hover effects.
-```
-
-#### 4. Add New Validation
-**Prompt for AI:**
-```
-Add file validation in backend/utils/file_validator.py to reject corrupted 
-PDF files. Check if file can be opened by pypdf before accepting.
-```
-
-#### 5. Change API Response Format
-**Prompt for AI:**
-```
-Modify the response format in backend/routes/extract.py to include 
-"category" field for each MCQ. Update json_formatter.py accordingly.
-```
-
-#### 6. Add Authentication
-**Prompt for AI:**
-```
-Add basic authentication to the Flask app. Create a simple login system
-where users need to enter a password to access the upload feature.
-```
-
-#### 7. Add More Question Types
-**Prompt for AI:**
-```
-Update the AI prompt in backend/services/ai_processor.py to also extract
-True/False questions along with multiple choice questions.
-```
-
----
-
-## Deployment Guide
-
-### Deploy to Render (Recommended):
-
-1. **Push code to GitHub:**
-```bash
-git add .
-git commit -m "Ready for deployment"
-git push origin main
-```
-
-2. **Go to render.com:**
-- Sign in with GitHub
-- Click "New" → "Web Service"
-
-3. **Configure:**
-- Name: `mcq-extractor-ai`
-- Environment: Python
-- Build Command: `pip install -r requirements.txt`
-- Start Command: `gunicorn backend.app:app --workers 4 --bind 0.0.0.0:$PORT`
-
-4. **Add Environment Variables:**
-- `GROQ_API_KEY` = your key (get from https://console.groq.com/keys)
-
-5. **Deploy!** 🎉
+1. Push to GitHub
+2. Create Web Service on Render.com
+3. Add `GROQ_API_KEY` environment variable
+4. Deploy!
 
 ---
 
 ## Troubleshooting
 
-### Common Issues:
-
-| Problem | Cause | Solution |
-|---------|-------|----------|
-| Empty [] array | PDF is scanned/image | Use text-based PDF |
-| API Error | GROQ_API_KEY not set | Add key in Render |
-| CORS Error | Wrong API URL | Check frontend API_BASE_URL |
-| File too big | PDF > 10MB | Compress PDF |
-| Server Error | Check logs | Check Render logs |
-
-### Check Logs:
-```bash
-# Local: Check terminal
-python run.py
-
-# Render: Go to Dashboard → Logs
-```
+| Problem | Solution |
+|---------|----------|
+| Empty results | Use text-based PDF (not scanned) |
+| API error | Check GROQ_API_KEY in .env |
+| CORS error | Check API_BASE_URL in frontend |
+| File too big | Compress PDF (<20MB, <50 pages) |
+| Slow response | First request on Render is slow (free tier) |
 
 ---
 
-## FAQ
-
-### Q: GROQ_API_KEY kahan se milega?
-**A:** https://console.groq.com/keys - Free account create karo aur key copy karo.
-
-### Q: PDF upload nahi ho raha?
-**A:** 
-- File size 10MB se kam hona chahiye
-- Sirf PDF files allowed hain
-
-### Q: MCQs nahi aaye?
-**A:**
-- PDF text-based hona chahiye (scanned PDFs mein OCR nahi hai)
-- GROQ_API_KEY add hona chahiye
-
-### Q: Localhost par kaise chalana hai?
-**A:** `python run.py` run karo aur browser mein `localhost:5000` open karo.
-
-### Q: GitHub Pages ka use kyun nahi kar sakte?
-**A:** GitHub Pages sirf static files serve karta hai. Python/Flask backend ke liye Render ya Vercel chahiye.
-
----
-
-## File Descriptions
-
-### Important Files:
-
-| File | Kya Karta Hai |
-|------|---------------|
-| `app.py` | Flask app create karta hai, routes register karta hai |
-| `config.py` | Settings load karta hai (API keys, paths) |
-| `ai_processor.py` | AI ko text bhejta hai, MCQs leta hai |
-| `pdf_reader.py` | PDF se text extract karta hai |
-| `upload.js` | Frontend se file upload handle karta hai |
-| `preview.js` | MCQs display karta hai |
-
----
-
-## API Endpoints
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/upload/file` | POST | PDF upload karta hai |
-| `/api/extract/<file_id>` | GET/POST | MCQs extract karta hai |
-| `/api/download/<filename>` | GET | JSON download karta hai |
-| `/api/health` | GET | Server status check |
-
----
-
-## Environment Variables
-
-| Variable | Kya Hai | Kahan Use Hota Hai |
-|----------|---------|-------------------|
-| `GROQ_API_KEY` | AI service key | ai_processor.py |
-| `SECRET_KEY` | Flask security | app.py |
-| `FLASK_ENV` | production/development | app.py |
-| `LOG_LEVEL` | INFO/DEBUG | app.py |
-
----
-
-## Security Features
-
-The application includes several security improvements to prevent abuse and protect server resources:
-
-### Upload Security Settings:
-
-| Setting | Value | Description |
-|---------|-------|-------------|
-| Max File Size | 20MB | PDF files larger than 20MB are rejected |
-| Max Pages | 50 | PDFs with more than 50 pages are rejected |
-| Rate Limit | 15/minute/IP | Maximum 15 uploads per minute per IP |
-| Auto Cleanup | 1 hour | Files older than 1 hour are automatically deleted |
-
-### Error Response Format:
-All error responses use standardized JSON format:
-```json
-{
-  "success": false,
-  "message": "Error message here"
-}
-```
-
-### Privacy Protection (.gitignore):
-The following files/directories are protected from git:
-- `storage/uploaded_pdfs/` - Uploaded PDF files
-- `storage/generated_json/` - Generated JSON files  
-- `.env` - Environment variables (API keys)
-- `*.db` - Database files
-
-Clients cannot directly access storage files - all access goes through API endpoints.
-
----
-
-## Export Formats
-
-The MCQ Extractor AI supports multiple export formats for your extracted questions:
-
-### Digital Formats (Export As button):
-| Format | Description | File Type |
-|--------|-------------|-----------|
-| JSON | Raw MCQ data | .json |
-| CSV | Spreadsheet format | .csv |
-| TXT | Plain text | .txt |
-| Markdown | Formatted text | .md |
-| HTML | Web page | .html |
-| XML | Structured data | .xml |
-| YAML | Configuration format | .yaml |
-| SQL | Database insert statements | .sql |
-| Aiken | Moodle format | .txt |
-| GIFT | Moodle import format | .txt |
-| Excel | Spreadsheet | .xlsx |
-
-### Print-Ready Formats (Print Formats button):
-| Format | Description | File Type |
-|--------|-------------|-----------|
-| Question Paper PDF | All questions with options (no answers) | .pdf |
-| Answer Key PDF | Question IDs with correct answers | .pdf |
-| OMR Sheet PDF | Questions + OMR bubble sheet at end | .pdf |
-| Tabular PDF | Table format with all data | .pdf |
-| DOCX Question Paper | Word document | .docx |
-
-### Export API Endpoint:
-```
-GET /api/download/export/<format>/<file_id>
-```
-
-Example:
-```
-/api/download/export/question_pdf/744a8cec-e5f2-4921-9516-99a7bd08d08b
-```
-
----
-
-## Credits
-
-- **AI:** GROQ (Llama 3.1 8B Model)
-- **Framework:** Flask
-- **PDF:** pypdf, pdfplumber
-- **Deployment:** Render
-
----
-
-Made with ❤️ for education
+Made with ❤️ using Flask + GROQ AI
 

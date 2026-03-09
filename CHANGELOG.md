@@ -4,6 +4,88 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Version 2.6.0] - 2026-03-08
+
+### New Features - Quiz Completion Messages
+
+#### 1. Enhanced Quiz Result Messages
+- Expanded from 6 to 26+ unique compliment messages
+- Messages are randomly selected for variety
+- Messages categorized by score range:
+
+| Score Range | Messages Count | Example Messages |
+|-------------|---------------|------------------|
+| 90-100% (Excellent) | 6 | "Perfect Score!", "Outstanding!", "Marvelous!", "Phenomenal!" |
+| 80-89% (Great) | 5 | "Awesome!", "Superb!", "Impressive!", "Terrific!" |
+| 70-79% (Good) | 5 | "Well Done!", "Nice Work!", "Great Effort!", "Thumbs Up!" |
+| 60-69% (Not Bad) | 5 | "Decent Job!", "Nice Try!", "Keep Going!" |
+| 50-59% (Fair) | 5 | "Almost There!", "Good Start!", "Keep Trying!" |
+| Below 50% | 6 | "Don't Give Up!", "Stay Positive!", "You Can Do It!" |
+
+#### 2. Random Message Selection
+- Each quiz completion randomly selects a message from the appropriate category
+- Adds variety and engagement to the quiz experience
+- Encourages users to try again for better scores
+
+### Files Modified
+- `js/quiz.js` - Added message arrays with 26+ unique compliments
+
+### Notes
+- No backend changes required
+- Lightweight implementation - no additional dependencies
+- Compatible with existing quiz system
+
+---
+
+## [Version 2.5.0] - 2026-03-08
+
+### New Features - Statistics & Social Links
+
+#### 1. Server Statistics System
+- JSON file-based storage (lightweight, no database required)
+- View counter: Increments automatically on every PDF extraction
+- Like/Dislike system with REST API endpoints:
+  - GET /api/stats - Get current statistics
+  - POST /api/stats/like - Increment likes
+  - POST /api/stats/dislike - Increment dislikes
+  - POST /api/stats/view - Manual view increment (also auto-called on extraction)
+- Initial values: Views=100, Likes=20, Dislikes=0
+
+#### 2. Anti-Spam System
+- Browser localStorage-based protection
+- Prevents multiple likes/dislikes from same browser session
+- Buttons disabled after voting with visual feedback
+
+#### 3. Social Links (All Pages)
+- GitHub: https://github.com/saurabh7429/mcq-extractor-ai
+- Instagram: https://www.instagram.com/sa_urabh7429
+- Telegram Support Group: https://t.me/+WvSRZuYAoh0yZTg1
+- Mobile responsive footer layout
+
+#### 4. Frontend Statistics Display
+- Views, Likes, Dislikes displayed with icons
+- Like/Dislike buttons with anti-spam protection
+- Real-time updates after voting
+
+### Files Added
+- `js/stats.js` - Statistics manager with API calls and anti-spam
+
+### Files Modified
+- `backend/routes/stats.py` - Added increment_view() function for extraction hook
+- `backend/routes/extract.py` - View increment on every extraction
+- `storage/stats.json` - JSON storage for statistics
+- `css/styles.css` - Statistics section and social links CSS
+- `index.html` - Added stats section and social links
+- `preview.html` - Added stats section and social links
+- `quiz.html` - Added stats section and social links
+
+### Performance
+- Lightweight JSON file storage (no database required)
+- Minimal memory footprint suitable for Render free tier (512MB RAM)
+- No heavy libraries used
+
+---
+
 ## [Version 2.4.0] - 2026-03-08
 
 ### New Features - Quiz System

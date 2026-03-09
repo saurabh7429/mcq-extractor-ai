@@ -6,7 +6,7 @@
 ![Flask](https://img.shields.io/badge/Flask-3.0+-green?style=for-the-badge)
 ![AI](https://img.shields.io/badge/AI-GROQ-purple?style=for-the-badge)
 ![Live](https://img.shields.io/badge/Live-Render-brightgreen?style=for-the-badge)
-![Version](https://img.shields.io/badge/Version-2.3.2-blue?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-2.6.0-blue?style=for-the-badge)
 
 ---
 
@@ -272,7 +272,32 @@ git push origin main
 
 ---
 
-## 📊 What's New in v2.3.2
+## 📊 What's New in v2.6.0
+
+### Quiz Enhancement (March 2026):
+- ✅ **26+ Compliment Messages:** Added variety of encouragement messages after quiz completion
+- ✅ **Random Selection:** Messages randomly selected from 6 categories based on score
+- ✅ **Engaging Experience:** Different messages each time user completes a quiz
+
+### Quiz Result Messages by Score:
+| Score | Messages |
+|-------|----------|
+| 90-100% | "Perfect Score!", "Outstanding!", "Marvelous!", "Phenomenal!" |
+| 80-89% | "Awesome!", "Superb!", "Impressive!", "Terrific!" |
+| 70-79% | "Well Done!", "Nice Work!", "Great Effort!" |
+| 60-69% | "Decent Job!", "Nice Try!", "Keep Going!" |
+| 50-59% | "Almost There!", "Good Start!", "Keep Trying!" |
+| Below 50% | "Don't Give Up!", "Stay Positive!", "You Can Do It!" |
+
+---
+
+## 📊 What's New in v2.5.0
+
+### Statistics & Social Links:
+- ✅ **View Counter:** Automatically counts PDF extractions
+- ✅ **Like/Dislike System:** Users can vote on the app
+- ✅ **Anti-Spam Protection:** Prevents multiple votes from same browser
+- ✅ **Social Links:** GitHub, Instagram, Telegram integration
 
 ### Security Improvements (March 2026):
 - ✅ **File Size Limit:** Increased from 10MB to 20MB

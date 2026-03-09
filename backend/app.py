@@ -1,7 +1,7 @@
 """
 Main Flask application factory.
 Creates and configures the Flask app with all necessary extensions and blueprints.
-""" 
+"""
 import logging
 import os
 from pathlib import Path
@@ -16,26 +16,21 @@ from backend.utils.error_handler import register_error_handlers
 def setup_logging(app):
     """
     Configure structured logging for the application.
-    
-    Args:
-        app: Flask application instance
     """
     log_level = getattr(logging, app.config['LOG_LEVEL'].upper(), logging.INFO)
     log_format = app.config['LOG_FORMAT']
     
-    # Configure root logger
     logging.basicConfig(
         level=log_level,
         format=log_format
     )
     
-    # Add file handler for persistent logs
     try:
         log_dir = Path(__file__).resolve().parent.parent / 'logs'
         log_dir.mkdir(exist_ok=True)
         file_handler = RotatingFileHandler(
             log_dir / 'app.log',
-            maxBytes=10 * 1024 * 1024,  # 10MB
+            maxBytes=10 * 1024 * 1024,
             backupCount=5
         )
         file_handler.setFormatter(logging.Formatter(log_format))
@@ -49,27 +44,14 @@ def setup_logging(app):
 
 
 def create_app(config_name: str = None):
-    """
-    Application factory function.
-    Creates and configures the Flask application.
-    
-    Args:
-        config_name: Name of configuration to use (defaults to environment variable)
-    
-    Returns:
-        Flask application instance
-    """
-    # Get configuration
     if config_name:
         os.environ['FLASK_ENV'] = config_name
     
     app = Flask(__name__)
     app.config.from_object(get_config())
     
-    # Setup logging
     setup_logging(app)
     
-    # Enable CORS for all routes
     CORS(app, resources={
         r"/api/*": {
             "origins": "*",
@@ -78,10 +60,8 @@ def create_app(config_name: str = None):
         }
     })
     
-    # Register error handlers
     register_error_handlers(app)
     
-    # Request logging middleware
     @app.before_request
     def log_request_info():
         app.logger.debug('Headers: %s', dict(request.headers))
@@ -89,28 +69,23 @@ def create_app(config_name: str = None):
     
     @app.after_request
     def add_security_headers(response):
-        """Add security headers to all responses."""
         response.headers['X-Content-Type-Options'] = 'nosniff'
         response.headers['X-Frame-Options'] = 'DENY'
         response.headers['X-XSS-Protection'] = '1; mode=block'
         return response
     
-    # Health check endpoint
     @app.route('/api/health', methods=['GET'])
     def health_check():
-        """Health check endpoint."""
         return jsonify({
             'status': 'healthy',
             'service': 'MCQ Extractor AI',
             'version': '1.0.0'
         }), 200
     
-# Serve frontend - root route
+    # Serve frontend - root route
     @app.route('/', methods=['GET'])
     def serve_index():
-        """Serve the main index.html page."""
         from flask import send_from_directory
-        # Serve from root directory
         root_path = Path(__file__).resolve().parent.parent
         return send_from_directory(root_path, 'index.html')
     
@@ -118,7 +93,6 @@ def create_app(config_name: str = None):
     @app.route('/preview', methods=['GET'])
     @app.route('/preview.html', methods=['GET'])
     def serve_preview():
-        """Serve the preview.html page."""
         from flask import send_from_directory
         root_path = Path(__file__).resolve().parent.parent
         return send_from_directory(root_path, 'preview.html')
@@ -127,29 +101,24 @@ def create_app(config_name: str = None):
     @app.route('/quiz', methods=['GET'])
     @app.route('/quiz.html', methods=['GET'])
     def serve_quiz():
-        """Serve the quiz.html page."""
         from flask import send_from_directory
         root_path = Path(__file__).resolve().parent.parent
         return send_from_directory(root_path, 'quiz.html')
     
-    # Serve static files from root (js, css, images)
+    # Serve static files from root
     @app.route('/<path:filename>', methods=['GET'])
     def serve_static(filename):
-        """Serve static files from root directory."""
         from flask import send_from_directory
         root_path = Path(__file__).resolve().parent.parent
         
-        # Check for files in root subdirectories (js, css, etc.)
         valid_dirs = ['js', 'css', 'images', 'assets', 'logo.png']
         
-        # If it's a known subdirectory/file, serve from there
         for dir_name in valid_dirs:
             if filename.startswith(dir_name + '/') or filename == dir_name:
                 file_path = root_path / filename
                 if file_path.exists() and file_path.is_file():
                     return send_from_directory(root_path, filename)
         
-        # Otherwise serve index.html for SPA routing
         return send_from_directory(root_path, 'index.html')
     
     # Register blueprints
@@ -167,30 +136,18 @@ def create_app(config_name: str = None):
 
 
 def register_blueprints(app):
-    """
-    Register all blueprints with the application.
+    from backend.routes import extract, upload, download, validate, stats
     
-    Args:
-        app: Flask application instance
-    """
-    from backend.routes import extract, upload, download, validate
-    
-    # Register blueprints with url_prefix
     app.register_blueprint(extract.bp, url_prefix='/api/extract')
     app.register_blueprint(upload.bp, url_prefix='/api/upload')
     app.register_blueprint(download.bp, url_prefix='/api/download')
     app.register_blueprint(validate.bp, url_prefix='/api/validate')
+    app.register_blueprint(stats.bp, url_prefix='/api/stats')
     
     app.logger.info("All blueprints registered successfully")
 
 
 def ensure_directories(app):
-    """
-    Ensure required directories exist.
-    
-    Args:
-        app: Flask application instance
-    """
     directories = [
         app.config['UPLOAD_FOLDER'],
         app.config['JSON_OUTPUT_FOLDER']
@@ -203,12 +160,6 @@ def ensure_directories(app):
 
 
 def init_database(app):
-    """
-    Initialize database and create tables.
-    
-    Args:
-        app: Flask application instance
-    """
     try:
         from backend.models.database import init_db, create_tables
         init_db(app)

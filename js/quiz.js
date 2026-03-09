@@ -479,33 +479,90 @@ function showResults() {
     resultWrong.textContent = wrongAnswers;
     resultPercentage.textContent = percentage + '%';
     
-    // Set result message based on score
+    // Set result message based on score - 20+ compliment messages!
     var title, message, iconClass;
     
+    // Score-based messages with 20+ variety
     if (percentage >= 90) {
-        title = 'Excellent!';
-        message = 'Outstanding performance! You nailed it!';
-        iconClass = 'excellent';
+        // Top tier - Excellent
+        const excellentMessages = [
+            { title: 'Excellent!', message: 'Outstanding performance! You nailed it!', icon: 'excellent' },
+            { title: 'Perfect Score!', message: 'You\'re a genius! Absolutely brilliant!', icon: 'excellent' },
+            { title: 'Outstanding!', message: 'Your hard work really paid off! Amazing!', icon: 'excellent' },
+            { title: 'Marvelous!', message: 'You\'ve mastered this material completely!', icon: 'excellent' },
+            { title: 'Spectacular!', message: 'Nothing short of perfection! Great job!', icon: 'excellent' },
+            { title: 'Phenomenal!', message: 'You\'re on fire! Keep up the amazing work!', icon: 'excellent' }
+        ];
+        const choice = excellentMessages[Math.floor(Math.random() * excellentMessages.length)];
+        title = choice.title;
+        message = choice.message;
+        iconClass = choice.icon;
     } else if (percentage >= 80) {
-        title = 'Great Job!';
-        message = 'Well done! Keep up the good work!';
-        iconClass = 'good';
+        // Great tier
+        const greatMessages = [
+            { title: 'Great Job!', message: 'Well done! Keep up the good work!', icon: 'good' },
+            { title: 'Awesome!', message: 'You\'re doing fantastic! Keep it up!', icon: 'good' },
+            { title: 'Superb!', message: 'Excellent effort! You\'re crushing it!', icon: 'good' },
+            { title: 'Impressive!', message: 'You\'re really excelling! Well deserved!', icon: 'good' },
+            { title: 'Terrific!', message: 'Amazing work! You\'re a star!', icon: 'good' }
+        ];
+        const choice = greatMessages[Math.floor(Math.random() * greatMessages.length)];
+        title = choice.title;
+        message = choice.message;
+        iconClass = choice.icon;
     } else if (percentage >= 70) {
-        title = 'Good Work!';
-        message = 'Nice job! You\'re on the right track!';
-        iconClass = 'good';
+        // Good tier
+        const goodMessages = [
+            { title: 'Good Work!', message: 'Nice job! You\'re on the right track!', icon: 'good' },
+            { title: 'Well Done!', message: 'You\'re making great progress!', icon: 'good' },
+            { title: 'Nice Work!', message: 'Keep pushing forward! You\'re improving!', icon: 'good' },
+            { title: 'Great Effort!', message: 'You\'re doing really well! Stay focused!', icon: 'good' },
+            { title: 'Thumbs Up!', message: 'You\'re getting there! Keep it going!', icon: 'good' }
+        ];
+        const choice = goodMessages[Math.floor(Math.random() * goodMessages.length)];
+        title = choice.title;
+        message = choice.message;
+        iconClass = choice.icon;
     } else if (percentage >= 60) {
-        title = 'Not Bad!';
-        message = 'Good effort! A little more practice will help.';
-        iconClass = 'average';
+        // Average tier - Not bad
+        const notBadMessages = [
+            { title: 'Not Bad!', message: 'Good effort! A little more practice will help.', icon: 'average' },
+            { title: 'Decent Job!', message: 'You\'re getting there! Keep practicing!', icon: 'average' },
+            { title: 'Nice Try!', message: 'You\'re improving! Don\'t give up!', icon: 'average' },
+            { title: 'Good Try!', message: 'Almost there! A bit more effort will get you there!', icon: 'average' },
+            { title: 'Keep Going!', message: 'You\'re making progress! Stay determined!', icon: 'average' }
+        ];
+        const choice = notBadMessages[Math.floor(Math.random() * notBadMessages.length)];
+        title = choice.title;
+        message = choice.message;
+        iconClass = choice.icon;
     } else if (percentage >= 50) {
-        title = 'Fair Attempt';
-        message = 'You\'re halfway there! Keep practicing!';
-        iconClass = 'average';
+        // Fair tier
+        const fairMessages = [
+            { title: 'Fair Attempt', message: 'You\'re halfway there! Keep practicing!', icon: 'average' },
+            { title: 'Not Bad!', message: 'You\'re improving! Review and try again!', icon: 'average' },
+            { title: 'Keep Trying!', message: 'You can do better! Don\'t stop now!', icon: 'average' },
+            { title: 'Almost There!', message: 'Just a little more practice needed!', icon: 'average' },
+            { title: 'Good Start!', message: 'You\'re building a foundation! Keep learning!', icon: 'average' }
+        ];
+        const choice = fairMessages[Math.floor(Math.random() * fairMessages.length)];
+        title = choice.title;
+        message = choice.message;
+        iconClass = choice.icon;
     } else {
-        title = 'Keep Practicing!';
-        message = 'Don\'t give up! Review the material and try again.';
-        iconClass = 'poor';
+        // Below 50% - Keep practicing
+        const practiceMessages = [
+            { title: 'Keep Practicing!', message: 'Don\'t give up! Review the material and try again.', icon: 'poor' },
+            { title: 'Don\'t Give Up!', message: 'Every expert was once a beginner. Keep trying!', icon: 'poor' },
+            { title: 'Stay Positive!', message: 'Practice makes perfect. You\'ll get there!', icon: 'poor' },
+            { title: 'Keep Learning!', message: 'Review your weak areas and try again!', icon: 'poor' },
+            { title: 'Never Give Up!', message: 'Success is just around the corner. Keep going!', icon: 'poor' },
+            { title: 'You Can Do It!', message: 'Believe in yourself and keep practicing!', icon: 'poor' }
+        ];
+        const choice = practiceMessages[Math.floor(Math.random() * practiceMessages.length)];
+        title = choice.title;
+        message = choice.message;
+        iconClass = choice.icon;
     }
     
     resultTitle.textContent = title;
