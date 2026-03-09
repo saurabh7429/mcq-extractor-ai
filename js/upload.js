@@ -28,7 +28,9 @@ const BASE_PATH = (function() {
     let base = path.endsWith('/') ? path.slice(0, -1) : path;
     // Get the repo name from the path
     const parts = base.split('/');
-    if (parts.length > 1 && parts[1]) {
+    // Check if the second part looks like a repo name (not a file like preview.html or index.html)
+    // Repo names typically don't have dots and are not .html files
+    if (parts.length > 1 && parts[1] && !parts[1].endsWith('.html') && parts[1] !== '') {
         return '/' + parts[1] + '/';
     }
     return '/';

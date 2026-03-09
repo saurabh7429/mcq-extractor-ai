@@ -36,6 +36,34 @@ class ExportService:
     def _get_correct_letter(self, correct_idx: int) -> str:
         return OPTION_LETTERS[correct_idx] if 0 <= correct_idx < 4 else 'A'
     
+    def _filter_mcqs(self, mcqs: List[Dict[str, Any]], selected_indices: List[int] = None, removed_indices: List[int] = None) -> List[Dict[str, Any]]:
+        """Filter MCQs based on selected and removed indices.
+        
+        Logic:
+        - If selected_indices is provided, only include those indices
+        - Always exclude removed_indices
+        - If neither is provided, return all MCQs
+        """
+        if not selected_indices and not removed_indices:
+            return mcqs
+        
+        filtered = []
+        removed_set = set(removed_indices) if removed_indices else set()
+        
+        if selected_indices:
+            # Only include selected indices that are not removed
+            selected_set = set(selected_indices)
+            for idx in selected_indices:
+                if idx not in removed_set and idx < len(mcqs):
+                    filtered.append(mcqs[idx])
+        else:
+            # Include all except removed
+            for idx, mcq in enumerate(mcqs):
+                if idx not in removed_set:
+                    filtered.append(mcq)
+        
+        return filtered
+    
     # JSON
     def export_json(self, mcqs: List[Dict[str, Any]], pretty: bool = True) -> str:
         return json.dumps(mcqs, indent=2, ensure_ascii=False) if pretty else json.dumps(mcqs, ensure_ascii=False)
@@ -862,10 +890,15 @@ class ExportService:
             raise ValueError("DOCX export requires python-docx. Install with: pip install python-docx")
     
     # Main export method
-    def export(self, file_id: str, format: str) -> Union[str, bytes]:
+    def export(self, file_id: str, format: str, selected_indices: List[int] = None, removed_indices: List[int] = None) -> Union[str, bytes]:
         mcqs = self.load_master_json(file_id)
         if not mcqs:
             raise ValueError("No MCQs found in the file")
+        
+        # Filter MCQs based on selected and removed indices
+        mcqs = self._filter_mcqs(mcqs, selected_indices, removed_indices)
+        if not mcqs:
+            raise ValueError("No MCQs available after filtering. Please select at least one question.")
         
         fmt = format.lower()
         

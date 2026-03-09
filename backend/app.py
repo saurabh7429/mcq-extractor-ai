@@ -123,6 +123,15 @@ def create_app(config_name: str = None):
         root_path = Path(__file__).resolve().parent.parent
         return send_from_directory(root_path, 'preview.html')
     
+    # Serve quiz page
+    @app.route('/quiz', methods=['GET'])
+    @app.route('/quiz.html', methods=['GET'])
+    def serve_quiz():
+        """Serve the quiz.html page."""
+        from flask import send_from_directory
+        root_path = Path(__file__).resolve().parent.parent
+        return send_from_directory(root_path, 'quiz.html')
+    
     # Serve static files from root (js, css, images)
     @app.route('/<path:filename>', methods=['GET'])
     def serve_static(filename):

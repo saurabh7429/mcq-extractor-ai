@@ -73,9 +73,31 @@ def list_files():
 def export_format(format: str, file_id: str):
     """Export MCQs to specified format."""
     logger.info(f"Export request: format={format}, file_id={file_id}")
+    
+    # Get selected and removed question indices from query params
+    selected_param = request.args.get('selected', '')
+    removed_param = request.args.get('removed', '')
+    
+    selected_indices = []
+    removed_indices = []
+    
+    if selected_param:
+        try:
+            selected_indices = [int(x) for x in selected_param.split(',') if x.strip()]
+        except ValueError:
+            logger.warning(f"Invalid selected parameter: {selected_param}")
+    
+    if removed_param:
+        try:
+            removed_indices = [int(x) for x in removed_param.split(',') if x.strip()]
+        except ValueError:
+            logger.warning(f"Invalid removed parameter: {removed_param}")
+    
+    logger.info(f"Export filter - selected: {selected_indices}, removed: {removed_indices}")
+    
     try:
         export_service = ExportService()
-        content = export_service.export(file_id, format)
+        content = export_service.export(file_id, format, selected_indices=selected_indices, removed_indices=removed_indices)
         
         format_info = {
             'json': ('application/json', 'json'),

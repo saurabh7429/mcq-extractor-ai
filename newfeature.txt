@@ -1,0 +1,101 @@
+Improve the frontend and user experience of the MCQ Extractor AI project without modifying the AI extraction pipeline.
+
+Important rules:
+
+1. AI must only be used for PDF → MCQ extraction.
+2. No additional AI calls should be used for quiz generation, filtering, or exports.
+3. All features must use the existing MASTER JSON data.
+4. Implementation must remain lightweight and safe for Render free tier (512MB RAM).
+
+Implement the following features:
+
+1. Question filtering system
+- Allow users to search questions in the preview page
+- Filter questions based on text search
+- Update results dynamically
+
+
+2. Remove unwanted MCQ feature
+- a delete button for all question card in preview page, which will remove the question from the quiz and export.
+- Removed questions should not appear in exports or quizzes
+- 
+
+3. Question selection system
+- Allow users to select specific questions
+- Provide checkbox selection
+- Only selected questions will be included in quizzes and exports
+- Update quiz and export data based on selected questions
+4. Quiz generator 
+generate quiz button appears on preview page, which will create a new quiz page with the following features:
+Create a new quiz page with:
+
+• mobile responsive layout  
+• a full screen quiz interface
+• one question at a time  
+• options clickable  
+• next button to proceed to next question
+• previous button to go back to previous question
+
+If correct → option turns green  
+If wrong → option turns red and correct answer highlighted.
+user can not change answer after selection.
+
+5. Quiz progress bar
+
+Display:
+
+3 / 10 questions completed
+
+The progress bar should show completion percentage.
+progress bar is looks like a horizontal bar that fills up as the user completes questions, with the percentage of completion displayed inside the bar.
+in progress bar, 2 colors are used to indicate progress: one color for how many questions are correctly answered and another color for how many questions are incorrectly answered.
+
+6. Random quiz generator
+
+Allow user to choose:
+
+• quiz from all questions
+• quiz from random selected number of questions
+• ask the number of questions for random quiz
+
+Example:
+
+5 questions  
+10 questions  
+20 questions
+
+7. Restart quiz button
+
+Allow restarting quiz with:
+
+• same questions
+• new random questions
+
+8. Quiz result screen
+
+Display:
+
+correct answers  
+wrong answers  
+percentage score
+a summary of performance, such as "Great job!" or "Needs improvement." many more complimentary messages can be added based on the score.
+
+9. Question shuffle
+
+Shuffle question order in quiz.
+also shuffle options within each question to prevent memorization of answer positions.
+do not change the correct answer mapping when shuffling options.
+
+
+10. Option shuffle
+
+Randomize option order while keeping correct answer mapping.
+
+11. exam mode:
+- add an exam mode that allows users to take a timed quiz with a set number of questions, number of questions is selected by the user (e.g., 10 questions)
+- in exam mode, users will have a limited amount of time to complete the quiz (e.g., 1 minute per question)(remaining time is always visible to the user during the quiz)
+- tab switching detection: if the user tries to switch tabs during the exam, a warning message will be displayed, and if they switch tabs more than a certain number of times (e.g., 3 times), the exam will be automatically submitted and the user's score will be calculated based on the questions answered up to that point.
+- Disable right-click and copy-paste functionality during the exam to prevent cheating. for both desktop and mobile devices, disable long-press functionality to prevent copying questions or answers.
+
+Keep everything lightweight and frontend driven.
+Do not introduce heavy libraries.

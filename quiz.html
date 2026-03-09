@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - MCQ Extractor AI</title>
+    <meta name="description" content="Take your MCQ quiz">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/quiz.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>
+</head>
+<body class="quiz-body">
+    <!-- Quiz Container -->
+    <div class="quiz-container" id="quizContainer">
+        <!-- Quiz Header -->
+        <header class="quiz-header">
+            <div class="quiz-header-left">
+                <h1 class="quiz-title">Quiz</h1>
+                <span class="quiz-progress-text" id="quizProgressText">1 / 10</span>
+            </div>
+            <div class="quiz-header-right">
+                <!-- Timer (Exam Mode) -->
+                <div class="quiz-timer hidden" id="quizTimer">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span id="timerDisplay">01:00</span>
+                </div>
+                <!-- Full Screen Button -->
+                <button class="quiz-fullscreen-btn" id="fullscreenBtn" title="Toggle fullscreen">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="expand-icon">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="compress-icon hidden">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25" />
+                    </svg>
+                </button>
+            </div>
+        </header>
+        
+        <!-- Progress Bar -->
+        <div class="quiz-progress-container">
+            <div class="quiz-progress-bar" id="quizProgressBar">
+                <div class="quiz-progress-correct" id="progressCorrect"></div>
+                <div class="quiz-progress-wrong" id="progressWrong"></div>
+                <div class="quiz-progress-text-overlay" id="progressTextOverlay">0%</div>
+            </div>
+            <div class="quiz-progress-stats" id="quizProgressStats">
+                <span class="stat-correct">✓ <span id="correctCount">0</span></span>
+                <span class="stat-wrong">✗ <span id="wrongCount">0</span></span>
+            </div>
+        </div>
+        
+        <!-- Quiz Content -->
+        <main class="quiz-content">
+            <!-- Question Card -->
+            <div class="quiz-question-card" id="questionCard">
+                <div class="question-number" id="questionNumber">Question 1</div>
+                <div class="question-text" id="questionText">Loading question...</div>
+                <div class="options-list" id="optionsList">
+                    <!-- Options will be dynamically inserted -->
+                </div>
+            </div>
+        </main>
+        
+        <!-- Quiz Navigation -->
+        <nav class="quiz-navigation">
+            <button class="quiz-nav-btn quiz-nav-prev" id="prevBtn" disabled>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7" />
+                </svg>
+                Previous
+            </button>
+            <button class="quiz-nav-btn quiz-nav-next" id="nextBtn">
+                Next
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </button>
+        </nav>
+        
+        <!-- Tab Switch Warning -->
+        <div class="tab-warning hidden" id="tabWarning">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <span>Warning: Do not switch tabs during the exam!</span>
+            <span class="tab-warning-count">(<span id="tabSwitchCount">0</span>/3)</span>
+        </div>
+    </div>
+    
+    <!-- Result Screen -->
+    <div class="result-screen hidden" id="resultScreen">
+        <div class="result-card">
+            <div class="result-icon" id="resultIcon">
+                <!-- Icon will be set based on score -->
+            </div>
+            <h1 class="result-title" id="resultTitle">Quiz Complete!</h1>
+            <p class="result-message" id="resultMessage">Great job!</p>
+            
+            <div class="result-stats">
+                <div class="result-stat">
+                    <span class="result-stat-value" id="resultCorrect">0</span>
+                    <span class="result-stat-label">Correct</span>
+                </div>
+                <div class="result-stat">
+                    <span class="result-stat-value" id="resultWrong">0</span>
+                    <span class="result-stat-label">Wrong</span>
+                </div>
+                <div class="result-stat">
+                    <span class="result-stat-value" id="resultPercentage">0%</span>
+                    <span class="result-stat-label">Score</span>
+                </div>
+            </div>
+            
+            <div class="result-actions">
+                <button class="btn btn-primary btn-lg" id="restartSameBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Restart Same Questions
+                </button>
+                <button class="btn btn-secondary btn-lg" id="restartRandomBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    New Random Questions
+                </button>
+                <button class="btn btn-warning btn-lg" id="backToPreviewBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back to Preview
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+    
+    <!-- Quiz Script -->
+    <script src="js/quiz.js"></script>
+</body>
+</html>
+

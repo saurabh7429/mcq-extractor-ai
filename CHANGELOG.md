@@ -4,6 +4,91 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Version 2.4.0] - 2026-03-08
+
+### New Features - Quiz System
+
+#### 1. Question Selection System
+- Added checkbox selection for each question in preview page
+- Select All / Deselect All buttons
+- Selection count display
+- Questions stored in session for quiz generation
+
+#### 2. Remove Unwanted MCQ Feature
+- Delete button for each question card in preview page
+- Removed questions marked visually (grayed out with "Removed" label)
+- Removed questions excluded from quiz and exports
+
+#### 3. Quiz Generator
+- "Generate Quiz" button on preview page
+- Modal to choose quiz type:
+  - All Questions (use all selected questions)
+  - Random Questions (choose number: 10, 25, 50, 80, 100 or custom)
+
+#### 4. Quiz Interface (New quiz.html)
+- Mobile responsive full-screen layout
+- One question at a time display
+- Clickable options with immediate feedback
+- Correct (green) / Wrong (red) highlighting
+- Previous and Next navigation buttons
+- Full-screen toggle button
+
+#### 5. Quiz Progress Bar
+- Horizontal progress bar showing completion
+- Two colors: green for correct, red for wrong answers
+- Percentage displayed inside the bar
+- Stats: correct/wrong count display
+
+#### 6. Question Shuffle
+- Questions shuffled randomly when quiz starts
+- Different order each time
+
+#### 7. Option Shuffle
+- Options randomized within each question
+- Correct answer mapping maintained
+
+#### 8. Quiz Result Screen
+- Correct answers count
+- Wrong answers count
+- Percentage score
+- Performance messages based on score:
+  - 90-100%: "Excellent! Outstanding performance!"
+  - 80-89%: "Great job! Well done!"
+  - 70-79%: "Good work! Keep it up!"
+  - 60-69%: "Not bad! Room for improvement."
+  - 50-59%: "Fair attempt. Try again!"
+  - Below 50%: "Keep practicing!"
+
+#### 9. Restart Quiz Options
+- Restart with same questions (shuffled)
+- New random questions option
+
+#### 10. Exam Mode Features (Infrastructure)
+- Tab switching detection with warning
+- Auto-submit after 3 tab switches
+- Anti-cheat measures:
+  - Right-click disabled
+  - Copy/paste disabled
+  - Long-press disabled on mobile
+  - Text selection disabled
+
+### Files Added
+- `quiz.html` - New quiz interface page
+- `css/quiz.css` - Quiz-specific styles
+- `js/quiz.js` - Quiz logic and functionality
+
+### Files Modified
+- `preview.html` - Added selection controls, quiz modal
+- `css/styles.css` - Added selection and quiz styles
+- `js/preview.js` - Added selection, deletion, quiz generation
+
+### Notes
+- All quiz functionality is frontend-driven (no additional API calls)
+- Questions shuffled for each quiz attempt
+- Ready for GitHub Pages and Render deployment
+
+---
+
 ## [Version 2.3.2] - 2026-03-08
 
 ### Security Improvements
