@@ -33,6 +33,9 @@ class Config:
     FLASK_DEBUG = os.getenv('FLASK_DEBUG', '0') == '1'
     SECRET_KEY = os.getenv('SECRET_KEY', os.urandom(24).hex())
     
+    # Base directory
+    BASE_DIR = BASE_DIR
+    
     # API Keys
     GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
     GROQ_API_KEY = os.getenv('GROQ_API_KEY', '')

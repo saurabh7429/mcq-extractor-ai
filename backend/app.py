@@ -136,13 +136,14 @@ def create_app(config_name: str = None):
 
 
 def register_blueprints(app):
-    from backend.routes import extract, upload, download, validate, stats
+    from backend.routes import extract, upload, download, validate, stats, status
     
     app.register_blueprint(extract.bp, url_prefix='/api/extract')
     app.register_blueprint(upload.bp, url_prefix='/api/upload')
     app.register_blueprint(download.bp, url_prefix='/api/download')
     app.register_blueprint(validate.bp, url_prefix='/api/validate')
     app.register_blueprint(stats.bp, url_prefix='/api/stats')
+    app.register_blueprint(status.bp, url_prefix='/api/status')
     
     app.logger.info("All blueprints registered successfully")
 

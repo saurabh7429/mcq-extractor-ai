@@ -4,6 +4,60 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Version 2.7.0] - 2026-03-10
+
+### New Features - Background Job Processing
+
+#### Problem
+- PDF extraction with AI processing could take >30 seconds
+- Render's request timeout (~30 seconds) caused failed requests
+- Users experienced timeouts without feedback
+
+#### Solution - Background Job System
+- Implemented file-based job tracking system
+- Jobs stored in `storage/jobs/<job_id>.json`
+- Survives server restarts (important for Render)
+
+#### New API Endpoints
+1. **POST /api/extract/<file_id>**
+   - Returns 202 Accepted with `job_id` for background processing
+   - Starts extraction in background thread
+   - Returns cached results immediately if available (200 OK)
+
+2. **GET /api/status/<job_id>**
+   - Returns job progress status
+   - Progress stages: reading_pdf → extracting_text → ai_processing → formatting → saving → completed
+   - Returns: status, progress%, pages_processed, mcqs_found
+
+#### Frontend Changes
+- Upload.js now polls job status every 2 seconds
+- Real-time progress updates in loading modal
+- Shows stage name, progress bar, MCQ count
+- Automatic redirect to preview on completion
+- Error handling for failed jobs
+
+#### Technical Details
+- Uses Python threading for background processing
+- File-based storage (no Redis/Celery - lightweight for 512MB RAM)
+- Thread-safe singleton JobManager
+- Automatic cleanup of old job files (>24 hours)
+
+#### Files Added
+- `backend/services/job_manager.py` - Job management with file storage
+- `backend/routes/status.py` - Status API endpoint
+
+#### Files Modified
+- `backend/routes/extract.py` - Background thread processing
+- `backend/app.py` - Registered status blueprint
+- `backend/config.py` - Added BASE_DIR to Config class
+- `js/upload.js` - Job polling and progress UI
+
+#### Benefits
+- No request timeouts on Render
+- Real-time user feedback during processing
+- Results saved to existing storage (backward compatible)
+- Lightweight implementation suitable for Render free tier
+
 ## [Version 2.6.1] - 2026-03-08
 
 ### Fix - GitHub Pages Like/Dislike System

@@ -199,6 +199,10 @@ function hideError() {
 
 // ==================== File Upload ====================
 
+// Polling interval for checking job status
+let jobPollingInterval = null;
+const JOB_POLL_INTERVAL = 2000; // Check every 2 seconds
+
 async function uploadFile() {
     if (!selectedFile) {
         showError('Please select a file first.', 'Click on the drop zone or drag and drop a PDF file.');
@@ -254,8 +258,8 @@ async function uploadFile() {
         // Update status - Reading PDF
         showLoading('Reading PDF...', 'Extracting text from your PDF document');
 
-        // Extract MCQs
-        showLoading('Extracting MCQs...', 'Using AI to analyze and extract questions');
+        // Extract MCQs - start background job
+        showLoading('Starting extraction...', 'Your PDF is being processed');
 
         const extractResponse = await fetch(`${API_BASE_URL}/extract/${fileId}`, {
             method: 'POST',
@@ -278,7 +282,6 @@ async function uploadFile() {
             if (extractData && extractData.suggestion) {
                 suggestion = extractData.suggestion;
             } else if (extractData && extractData.error) {
-                // Try to generate suggestion from error
                 suggestion = extractData.suggestion || _generateSuggestion(extractData.error);
             } else if (!extractResponse.ok) {
                 suggestion = 'Please check if the server is running and try again.';
@@ -287,28 +290,45 @@ async function uploadFile() {
             throw new Error(msg);
         }
 
-        // Update status - Saving to database
-        showLoading('Saving to database...', 'Storing your MCQs securely');
-
-        // Store file_id in sessionStorage for preview page
-        sessionStorage.setItem('currentFileId', fileId);
-        sessionStorage.setItem('currentFileName', selectedFile.name);
-
-        // Hide loading
-        hideLoading();
-
-        // Show success message
-        showSuccess();
-
-        // Redirect to preview page after short delay
-        // Use BASE_PATH to handle sub-directory hosting on GitHub Pages
-        setTimeout(() => {
-            window.location.href = BASE_PATH + 'preview.html';
-        }, 1500);
+        // Check if we got a job_id (background processing) or immediate result
+        if (extractData.job_id) {
+            // Background job - poll for status
+            const jobId = extractData.job_id;
+            console.log('Job started with ID:', jobId);
+            
+            // Store job_id and file_id for status polling
+            sessionStorage.setItem('currentJobId', jobId);
+            sessionStorage.setItem('currentFileId', fileId);
+            sessionStorage.setItem('currentFileName', selectedFile.name);
+            
+            // Start polling for job status
+            await pollJobStatus(jobId, fileId);
+        } else if (extractData.cached) {
+            // Cached result - go directly to preview
+            sessionStorage.setItem('currentFileId', fileId);
+            sessionStorage.setItem('currentFileName', selectedFile.name);
+            hideLoading();
+            showSuccess();
+            setTimeout(() => {
+                window.location.href = BASE_PATH + 'preview.html';
+            }, 1500);
+        } else {
+            // Immediate result (shouldn't happen with new implementation)
+            sessionStorage.setItem('currentFileId', fileId);
+            sessionStorage.setItem('currentFileName', selectedFile.name);
+            hideLoading();
+            showSuccess();
+            setTimeout(() => {
+                window.location.href = BASE_PATH + 'preview.html';
+            }, 1500);
+        }
 
     } catch (error) {
         console.error('Upload error:', error);
         hideLoading();
+        
+        // Stop polling if active
+        stopJobPolling();
         
         // Try to extract suggestion from error
         let suggestion = null;
@@ -317,6 +337,114 @@ async function uploadFile() {
         }
         
         showError(error.message || 'An error occurred during upload. Please try again.', suggestion);
+    }
+}
+
+async function pollJobStatus(jobId, fileId) {
+    // Show initial loading state
+    showLoading('Processing your PDF...', 'This may take a few moments');
+    
+    return new Promise((resolve, reject) => {
+        jobPollingInterval = setInterval(async () => {
+            try {
+                const statusResponse = await fetch(`${API_BASE_URL}/status/${jobId}`);
+                
+                if (!statusResponse.ok) {
+                    console.error('Status check failed:', statusResponse.status);
+                    return;
+                }
+                
+                const statusData = await statusResponse.json();
+                console.log('Job status:', statusData);
+                
+                if (!statusData.success) {
+                    console.error('Job status error:', statusData);
+                    return;
+                }
+                
+                // Update loading UI with progress
+                updateLoadingProgress(statusData);
+                
+                // Check if completed
+                if (statusData.status === 'completed') {
+                    stopJobPolling();
+                    
+                    // Store file_id for preview
+                    sessionStorage.setItem('currentFileId', fileId);
+                    sessionStorage.setItem('currentFileName', selectedFile.name);
+                    
+                    hideLoading();
+                    showSuccess();
+                    
+                    // Redirect to preview page
+                    setTimeout(() => {
+                        window.location.href = BASE_PATH + 'preview.html';
+                    }, 1500);
+                    
+                    resolve(statusData);
+                }
+                
+                // Check if failed
+                if (statusData.status === 'failed') {
+                    stopJobPolling();
+                    hideLoading();
+                    
+                    let errorMsg = statusData.error || 'Extraction failed';
+                    showError(errorMsg, _generateSuggestion(errorMsg));
+                    
+                    reject(new Error(errorMsg));
+                }
+                
+            } catch (error) {
+                console.error('Error polling job status:', error);
+            }
+        }, JOB_POLL_INTERVAL);
+    });
+}
+
+function stopJobPolling() {
+    if (jobPollingInterval) {
+        clearInterval(jobPollingInterval);
+        jobPollingInterval = null;
+    }
+}
+
+function updateLoadingProgress(statusData) {
+    const loadingTitle = document.getElementById('loadingTitle');
+    const loadingSubtitle = document.getElementById('loadingSubtitle');
+    const progressBar = document.getElementById('progressBar');
+    
+    // Map stages to user-friendly messages
+    const stageMessages = {
+        'reading_pdf': 'Reading PDF...',
+        'extracting_text': 'Extracting text...',
+        'ai_processing': 'Analyzing with AI...',
+        'formatting': 'Formatting MCQs...',
+        'saving': 'Saving results...',
+        'completed': 'Complete!'
+    };
+    
+    const stage = statusData.stage || 'processing';
+    const progress = statusData.progress || 0;
+    const message = statusData.message || stageMessages[stage] || 'Processing...';
+    
+    // Update UI
+    if (loadingTitle) {
+        loadingTitle.textContent = stageMessages[stage] || 'Processing...';
+    }
+    if (loadingSubtitle) {
+        let subtitle = message;
+        // Add additional info if available
+        if (statusData.mcqs_found !== undefined) {
+            subtitle += ` (${statusData.mcqs_found} MCQs found)`;
+        }
+        if (statusData.pages_processed && statusData.total_pages) {
+            subtitle += ` - Page ${statusData.pages_processed}/${statusData.total_pages}`;
+        }
+        loadingSubtitle.textContent = subtitle;
+    }
+    if (progressBar) {
+        progressBar.style.width = `${Math.min(progress, 100)}%`;
     }
 }
 
