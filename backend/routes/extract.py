@@ -226,19 +226,20 @@ def get_extraction_status(task_id: str):
     }), 200
 
 
-@bp.route('/<file_id>', methods=['POST'])
+@bp.route('/<file_id>', methods=['GET', 'POST'])
 def extract_text_from_file(file_id: str):
     """
-    Start background extraction for a PDF file by file_id.
-    Creates a job and returns immediately with job_id.
+    Get or start extraction for a PDF file by file_id.
+    - GET: Returns cached MCQs if available
+    - POST: Starts background extraction, returns job_id
     
     Args:
         file_id: Unique identifier of the uploaded file
     
     Returns:
-        JSON response with job_id for status checking
+        JSON response with MCQs or job_id
     """
-    logger.info(f"Starting background extraction for file_id: {file_id}")
+    logger.info(f"Handling extraction request for file_id: {file_id}")
     
     # Validate file_id format
     if not file_id:
@@ -266,6 +267,11 @@ def extract_text_from_file(file_id: str):
             except json.JSONDecodeError:
                 logger.warning("Failed to parse cached JSON, will re-extract")
         
+        # For GET requests without cache, return error
+        if request.method == 'GET':
+            raise ValidationError("No cached MCQs found. Please upload the file first.")
+        
+        # For POST requests without cache, start background extraction
         # Create a new background job
         job_manager = get_job_manager()
         job_id = job_manager.create_job(
@@ -292,6 +298,8 @@ def extract_text_from_file(file_id: str):
             'file_id': file_id
         }), 202  # 202 Accepted - request accepted for processing
         
+    except ValidationError:
+        raise
     except Exception as e:
         logger.exception(f"Error starting background extraction: {str(e)}")
         raise ValidationError(f"Failed to start extraction: {str(e)}")
